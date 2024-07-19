@@ -8,13 +8,15 @@ function onGAPILoad() {
 
 function handleCredentialResponse(response) {
     const token = response.credential;
+    console.log('Token received:', token); // Debugging line to check the token
 
     gapi.load('client', () => {
         gapi.client.init({
-            apiKey: config.googleClientId, // Make sure the client ID is correct
+            apiKey: config.googleClientId,
             discoveryDocs: ['https://sheets.googleapis.com/$discovery/rest?version=v4'],
             scope: 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.file',
         }).then(() => {
+            console.log('Google API client initialized'); // Debugging line
             gapi.client.setToken({ access_token: token });
             // Now the Google API client is initialized, set up the buttons to work with it
             document.querySelectorAll('.google-buttons button').forEach(button => {
