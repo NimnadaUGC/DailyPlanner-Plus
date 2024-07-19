@@ -13,10 +13,10 @@ function handleCredentialResponse(response) {
     function initGAPIClient() {
         gapi.client.init({
             clientId: config.googleClientId,
-            clientSecret: config.googleClientSecret,
             discoveryDocs: ['https://sheets.googleapis.com/$discovery/rest?version=v4'],
+            scope: 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.file',
         }).then(() => {
-            gapi.client.setToken({ access_token: token });
+            gapi.auth.setToken({ access_token: token });
         }).catch(error => {
             console.error('Error initializing Google API client:', error);
         });
@@ -58,6 +58,7 @@ function createGoogleSheet(tasks) {
         resource: spreadsheet,
     }).then(response => {
         console.log('Spreadsheet created:', response);
+        return response;
     }).catch(error => {
         console.error('Error creating Google Sheet:', error);
     });
@@ -78,4 +79,5 @@ function uploadToGoogleDrive() {
     });
 }
 
-onGAPILoad();
+// Ensure the GIS script is loaded before initializing
+document.addEventListener('DOMContentLoaded', onGAPILoad);
