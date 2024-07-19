@@ -1,17 +1,26 @@
 function onGAPILoad() {
-    gapi.load('client:auth2', initClient);
+    google.accounts.id.initialize({
+        client_id: config.googleClientId,
+        callback: handleCredentialResponse,
+    });
+    google.accounts.id.prompt(); // Display the One Tap prompt
 }
 
-function initClient() {
-    gapi.client.init({
-        clientId: config.googleClientId,
-        discoveryDocs: ['https://sheets.googleapis.com/$discovery/rest?version=v4'],
-        scope: 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.file',
-    }).then(function () {
-        gapi.auth2.getAuthInstance().signIn();
-    }).catch(function (error) {
-        console.error('Error initializing Google API client:', error);
-    });
+function handleCredentialResponse(response) {
+    const token = response.credential;
+    gapi.load('client', initGAPIClient);
+
+    function initGAPIClient() {
+        gapi.client.init({
+            clientId: config.googleClientId,
+            clientSecret: config.googleClientSecret,
+            discoveryDocs: ['https://sheets.googleapis.com/$discovery/rest?version=v4'],
+        }).then(() => {
+            gapi.client.setToken({ access_token: token });
+        }).catch(error => {
+            console.error('Error initializing Google API client:', error);
+        });
+    }
 }
 
 function createGoogleSheet(tasks) {
@@ -47,9 +56,9 @@ function createGoogleSheet(tasks) {
 
     return gapi.client.sheets.spreadsheets.create({
         resource: spreadsheet,
-    }).then(function (response) {
+    }).then(response => {
         console.log('Spreadsheet created:', response);
-    }).catch(function (error) {
+    }).catch(error => {
         console.error('Error creating Google Sheet:', error);
     });
 }
@@ -69,4 +78,4 @@ function uploadToGoogleDrive() {
     });
 }
 
-gapi.load('client:auth2', onGAPILoad);
+onGAPILoad();
