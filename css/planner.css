@@ -1,0 +1,364 @@
+body {
+    font-family: inherit;
+    font-size: 14px; /* Reduced overall font size */
+}
+
+#planner {
+    margin-top: 20px;
+    width: 100%;
+    max-width: 90%; /* Increased maximum width for planner */
+    overflow-y: auto;
+    max-height: 500px;
+    padding: 10px;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    transition: background 0.3s, border-color 0.3s;
+    position: relative;
+}
+
+body.dark-mode #planner {
+    background: #222;
+    border-color: #666;
+}
+
+#planner-heading {
+    font-family: inherit;
+    font-size: 1.5em;
+    margin-bottom: 10px;
+    text-align: center;
+    color: #333;
+}
+
+body.dark-mode #planner-heading {
+    color: #ffffff;
+}
+
+.planner-input {
+    display: flex;
+    position: sticky;
+    top: 0;
+    background: inherit;
+    z-index: 1;
+    padding: 10px 0;
+}
+
+.planner-input input[type="text"] {
+    font-family: inherit;
+    padding: 10px;
+    margin-right: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 70%;
+    font-size: 1em;
+    background: white;
+    color: black;
+    transition: background 0.3s, color 0.3s, border-color 0.3s;
+}
+
+body.dark-mode .planner-input input[type="text"] {
+    background: #333;
+    color: white;
+    border-color: #666;
+}
+
+.planner-input button {
+    font-family: inherit;
+    padding: 10px 20px;
+    border: none;
+    background-color: #2196F3;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s;
+}
+
+.planner-input button:hover {
+    background-color: #1976D2;
+}
+
+body.dark-mode .planner-input button {
+    background-color: #FFC107;
+    color: black;
+}
+
+body.dark-mode .planner-input button:hover {
+    background-color: #FFA000;
+}
+
+#task-list {
+    margin-top: 10px;
+    list-style-type: none;
+    padding: 0;
+    width: 100%; /* Ensure task list takes full width of the planner */
+}
+
+#task-list li {
+    font-family: inherit;
+    padding: 10px;
+    margin-bottom: 5px;
+    background: #f9f9f9;
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-start;
+    transition: background 0.3s, color 0.3s;
+}
+
+body.dark-mode #task-list li {
+    background: #333;
+    color: white;
+}
+
+#task-list li.completed {
+    text-decoration: line-through;
+    opacity: 0.6;
+}
+
+.task-title {
+    font-size: 1.2em; /* Increased font size for task title */
+    font-weight: bold; /* Make task title bold */
+    margin-bottom: 10px; /* Add space between task title and other sections */
+}
+
+.subtask-title {
+    font-weight: bold; /* Highlight subtask titles */
+}
+
+#task-list .task-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.task-actions button {
+    font-family: inherit;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 1em;
+    transition: color 0.3s;
+}
+
+.task-actions .edit {
+    color: orange;
+}
+
+.task-actions .delete {
+    color: red;
+}
+
+.task-actions .complete {
+    color: green;
+}
+
+.task-actions button:hover {
+    color: #2196F3;
+}
+
+body.dark-mode .task-actions button:hover {
+    color: #FFC107;
+}
+
+#task-list .note textarea {
+    font-family: inherit;
+    width: 400%; /* Four times the current size */
+    max-width: 100%; /* Ensure it is responsive */
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background: white;
+    color: black;
+    resize: vertical;
+    height: 100px; /* Larger text area for notes */
+}
+
+body.dark-mode #task-list .note textarea {
+    background: #333;
+    color: white;
+    border-color: #666;
+}
+
+.subtask {
+    margin-top: 10px;
+    padding-left: 20px;
+    list-style-type: decimal;
+    font-size: 0.9em; /* Smaller font size for subtasks */
+}
+
+.subtask hr {
+    width: 100%; /* Ensure the horizontal line takes full width */
+    border: none;
+    border-top: 1px solid #ccc;
+    margin-top: 10px;
+}
+
+body.dark-mode .subtask hr {
+    border-top-color: #666;
+}
+
+.subtask-input {
+    display: flex;
+    margin-top: 10px;
+    width: 100%;
+    font-size: 0.9em; /* Smaller font size for subtasks input */
+}
+
+.subtask-input input[type="text"] {
+    font-family: inherit;
+    flex: 1;
+    padding: 8px;
+    margin-right: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background: white;
+    color: black;
+}
+
+body.dark-mode .subtask-input input[type="text"] {
+    background: #333;
+    color: white;
+    border-color: #666;
+}
+
+.subtask-input button {
+    font-family: inherit;
+    padding: 8px 12px;
+    border: none;
+    background-color: #2196F3;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em; /* Smaller button for subtasks */
+    transition: background-color 0.3s;
+}
+
+.subtask-input button:hover {
+    background-color: #1976D2;
+}
+
+body.dark-mode .subtask-input button {
+    background-color: #FFC107;
+    color: black;
+}
+
+body.dark-mode .subtask-input button:hover {
+    background-color: #FFA000;
+}
+
+.subtask-input .delete {
+    font-size: 0.8em; /* Smaller delete button */
+    color: red;
+}
+
+.subtask-input .delete:hover {
+    color: #FF4D4D;
+}
+
+.subtask-list .delete {
+    font-size: 0.8em; /* Smaller delete button */
+    color: red;
+    margin-left: 10px;
+}
+
+.subtask-list .delete:hover {
+    color: #FF4D4D;
+}
+
+.custom-alert {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #fff;
+    border: 1px solid #ccc;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    display: none;
+}
+
+.custom-alert.dark-mode {
+    background-color: #333;
+    color: white;
+    border-color: #666;
+}
+
+.custom-alert button {
+    font-family: inherit;
+    padding: 10px 20px;
+    border: none;
+    background-color: #2196F3;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s;
+}
+
+.custom-alert button:hover {
+    background-color: #1976D2;
+}
+
+body.dark-mode .custom-alert button {
+    background-color: #FFC107;
+    color: black;
+}
+
+body.dark-mode .custom-alert button:hover {
+    background-color: #FFA000;
+}
+
+@media (max-width: 600px) {
+    .planner-input input[type="text"] {
+        width: 60%;
+    }
+
+    .planner-input button {
+        font-size: 0.9em;
+    }
+
+    #planner {
+        max-width: 100%;
+    }
+
+    #task-list .note textarea {
+        width: 100%;
+    }
+}
+
+.google-buttons {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.google-buttons button {
+    padding: 10px 20px;
+    border: none;
+    background-color: #2196F3;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1em;
+    font-family: inherit; /* Inherit font */
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.google-buttons button:hover {
+    background-color: #1976D2;
+}
+
+body.dark-mode .google-buttons button {
+    background-color: #FFC107;
+    color: black;
+}
+
+body.dark-mode .google-buttons button:hover {
+    background-color: #FFA000;
+}
+

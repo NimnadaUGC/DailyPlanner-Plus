@@ -1,0 +1,161 @@
+/* Clock Styles */
+#clock-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+#toggle-clock {
+    margin-left: 20px; /* Added space between the clock and the button */
+    padding: 5px 10px; /* Made the button smaller */
+    border: none;
+    background-color: #2196F3;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8em; /* Adjusted font size to match the smaller button */
+    font-family: inherit;
+}
+
+#toggle-clock:hover {
+    background-color: #1976D2;
+}
+
+body.dark-mode #toggle-clock {
+    background-color: #FFC107;
+    color: black;
+}
+
+body.dark-mode #toggle-clock:hover {
+    background-color: #FFA000;
+}
+
+.clock {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5em;
+}
+
+.small-clock {
+    width: 100px;
+    height: 100px;
+    text-align: center;
+}
+
+body.dark-mode .small-clock {
+    background: black; /* Black background for dark mode */
+}
+
+.digital-clock {
+    font-size: 0.8em;
+    font-weight: bold;
+    background: white; /* White background for light mode */
+    border: 3px solid #2196F3; /* Blue border for light mode */
+    border-radius: 12px;
+    padding: 5px;
+    box-shadow: 0 15px 25px rgba(0, 0, 0, 0.1), 0 25px 45px rgba(0, 0, 0, 0.1); /* Same shadow as analog clock */
+    color: #2196F3; /* Default text color to blue */
+}
+
+body.dark-mode .digital-clock {
+    border-color: #FFC107; /* Yellow border for dark mode */
+    color: #FFC107; /* Change text color to yellow in dark mode */
+}
+
+.analog-clock {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    border: 3px solid #2196F3; /* Blue border for light mode */
+    border-radius: 50%;
+    background: white; /* White background for light mode */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 15px 25px rgba(0, 0, 0, 0.1), 0 25px 45px rgba(0, 0, 0, 0.1);
+}
+
+body.dark-mode .analog-clock {
+    border-color: #FFC107; /* Yellow border for dark mode */
+}
+
+.analog-clock .indicator {
+    position: absolute;
+    height: 5px;
+    width: 5px;
+    display: flex;
+    justify-content: center;
+}
+
+.indicator::before {
+    content: "";
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    border-radius: 50%;
+    z-index: 100;
+}
+
+.analog-clock .hand {
+    position: absolute;
+    transform-origin: bottom;
+    bottom: 50%;
+    border-radius: 25px;
+    background: #2196F3; /* Blue hands for light mode */
+}
+
+body.dark-mode .analog-clock .hand {
+    background: #FFC107; /* Yellow hands for dark mode */
+}
+
+.analog-clock .hour-hand {
+    height: 25px;
+    width: 4px;
+}
+
+.analog-clock .minute-hand {
+    height: 35px;
+    width: 3px;
+}
+
+.analog-clock .second-hand {
+    height: 45px;
+    width: 2px;
+}
+
+.analog-clock label {
+    position: absolute;
+    inset: -12px;
+    text-align: center;
+    transform: rotate(calc(var(--i) * (360deg / 12)));
+}
+
+.analog-clock label span {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    color: #2196F3;
+    transform: rotate(calc(var(--i) * (-360deg / 12)));
+}
+
+body.dark-mode .analog-clock label span {
+    color: #FFC107;
+}
+
+.hidden {
+    display: none;
+}
+
+/* Horizontal line separator */
+#separator {
+    width: 100%;
+    border-top: 2px solid #ccc;
+    margin: 20px 0;
+}
+
+body.dark-mode #separator {
+    border-top: 2px solid #666;
+}

@@ -5,12 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Daily Planner Plus</title>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/clock.css">
+    <link rel="stylesheet" href="css/planner.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script src="https://apis.google.com/js/api.js"></script>
 </head>
 <body>
     <header>
         <h1>Daily Planner Plus</h1>
         <div>
-            <button onclick="location.href='pomodoro.html'">Pomodoro Timer</button> <br><br>
+            <button onclick="location.href='pomodoro.html'">Pomodoro Timer</button>
+            <br><br>
             <label class="switch">
                 <input type="checkbox" id="theme-toggle">
                 <span class="slider round"></span>
@@ -19,11 +24,41 @@
         </div>
     </header>
     <main>
-        <div id="clock"></div>
+        <div id="clock-container">
+            <div id="digital-clock" class="clock small-clock digital-clock"></div>
+            <div id="analog-clock" class="clock small-clock analog-clock hidden">
+                <div class="indicator">
+                    <span class="hand hour-hand"></span>
+                    <span class="hand minute-hand"></span>
+                    <span class="hand second-hand"></span>
+                </div>
+                <label style="--i: 1"><span>1</span></label>
+                <label style="--i: 2"><span>2</span></label>
+                <label style="--i: 3"><span>3</span></label>
+                <label style="--i: 4"><span>4</span></label>
+                <label style="--i: 5"><span>5</span></label>
+                <label style="--i: 6"><span>6</span></label>
+                <label style="--i: 7"><span>7</span></label>
+                <label style="--i: 8"><span>8</span></label>
+                <label style="--i: 9"><span>9</span></label>
+                <label style="--i: 10"><span>10</span></label>
+                <label style="--i: 11"><span>11</span></label>
+                <label style="--i: 12"><span>12</span></label>
+            </div>
+            <button id="toggle-clock">Switch to Analog Clock</button>
+        </div>
+        <div id="separator"></div>
         <div id="planner">
-            <input type="text" id="task-input" placeholder="Add new task">
-            <button onclick="addTask()">Add Task</button>
+            <div id="planner-heading">Daily Planner</div>
+            <div class="planner-input">
+                <input type="text" id="task-input" placeholder="Add new task">
+                <button onclick="addTask()">Add Task</button>
+            </div>
             <ul id="task-list"></ul>
+            <div class="google-buttons">
+                <button onclick="downloadGoogleSheet()">Download Google Sheet</button>
+                <button onclick="uploadToGoogleDrive()">Add to Your Google Drive</button>
+            </div>
         </div>
     </main>
     <footer>
@@ -39,5 +74,7 @@
     <script src="js/clock.js"></script>
     <script src="js/planner.js"></script>
     <script src="js/theme.js"></script>
+    <script src="js/google.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
 </body>
 </html>

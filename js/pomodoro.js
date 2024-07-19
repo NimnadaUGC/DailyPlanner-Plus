@@ -1,15 +1,22 @@
 let isPomodoroRunning = false;
 let pomodoroTimer;
-// let workTime = 25 * 60; // 25 minutes
-// let shortBreakTime = 5 * 60; // 5 minutes
-// let longBreakTime = 15 * 60; // 15 minutes
-let workTime = 0.1 * 60;  // Testing time
-let shortBreakTime = 0.1 * 60;  // Testing time
-let longBreakTime = 0.1 * 60;  // Testing time
+let workTime = 25 * 60; // 25 minutes
+let shortBreakTime = 5 * 60; // 5 minutes
+let longBreakTime = 15 * 60; // 15 minutes
 let currentTime = workTime;
 let isBreak = false;
 let workSessionsCompleted = 0;
 let firstStart = true;
+
+document.addEventListener('keydown', function(event) {
+    if (event.code === 'Space') {
+        if (isPomodoroRunning) {
+            stopPomodoro();
+        } else {
+            startPomodoro();
+        }
+    }
+});
 
 function startPomodoro() {
     if (!isPomodoroRunning) {
