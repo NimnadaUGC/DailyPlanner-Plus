@@ -13,7 +13,7 @@ function handleCredentialResponse(response) {
 
     gapi.load('client', () => {
         gapi.client.init({
-            apiKey: config.googleClientId,
+            client_id: config.googleClientId,
             discoveryDocs: ['https://sheets.googleapis.com/$discovery/rest?version=v4'],
             scope: 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.file'
         }).then(() => {
