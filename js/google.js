@@ -1,30 +1,23 @@
 function onGAPILoad() {
-    google.accounts.id.initialize({
-        client_id: config.googleClientId,
-        callback: handleCredentialResponse,
-    });
-    google.accounts.id.prompt(); // Display the One Tap prompt
+    gapi.load('client:auth2', initClient);
 }
 
-function handleCredentialResponse(response) {
-    const token = response.credential;
-    console.log('Token received:', token); // Debugging line to check the token
-
-    gapi.load('client', () => {
-        gapi.client.init({
-            apiKey: config.googleClientId,
-            discoveryDocs: ['https://sheets.googleapis.com/$discovery/rest?version=v4'],
-            scope: 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.file',
-        }).then(() => {
-            console.log('Google API client initialized'); // Debugging line
-            gapi.client.setToken({ access_token: token });
-            // Now the Google API client is initialized, set up the buttons to work with it
+function initClient() {
+    gapi.client.init({
+        clientId: config.googleClientId,
+        discoveryDocs: ['https://sheets.googleapis.com/$discovery/rest?version=v4'],
+        scope: 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.file'
+    }).then(() => {
+        gapi.auth2.getAuthInstance().signIn().then(() => {
+            console.log('Google API client initialized');
             document.querySelectorAll('.google-buttons button').forEach(button => {
                 button.disabled = false;
             });
         }).catch(error => {
-            console.error('Error initializing Google API client:', error);
+            console.error('Error during sign-in:', error);
         });
+    }).catch(error => {
+        console.error('Error initializing Google API client:', error);
     });
 }
 
@@ -62,7 +55,6 @@ function createGoogleSheet(tasks) {
     return gapi.client.sheets.spreadsheets.create({
         resource: spreadsheet,
     }).then(response => {
-        console.log('Spreadsheet created:', response);
         return response.result.spreadsheetId;
     }).catch(error => {
         console.error('Error creating Google Sheet:', error);
