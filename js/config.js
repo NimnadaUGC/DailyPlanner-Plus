@@ -1,5 +1,5 @@
 // Configuration for API Keys and other settings
 const config = {
-    googleClientId: '881997319836-hle2pgr3mpvfisus8444t9afnim5vnl1.apps.googleusercontent.com',  // Replace with your Google Client ID for OAuth
-    googleClientSecret: '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'  // Replace with your Google Client Secret for OAuth
+    googleClientId: '1018812094061-38m6dulsuh381o21qthm3hn6b8kvdemd.apps.googleusercontent.com',  // Replace with your Google Client ID for OAuth
+    googleClientSecret: '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'  // Replace with your Google Client Secret for OAuth
 };

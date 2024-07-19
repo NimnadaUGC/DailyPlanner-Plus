@@ -75,24 +75,30 @@ document.addEventListener('DOMContentLoaded', function() {
     function editTask(button) {
         const li = button.closest('li');
         const taskTitle = li.querySelector('.task-title');
-        const newValue = prompt('Edit task:', taskTitle.textContent.split('. ')[1]);
-        if (newValue) {
-            const taskNumber = li.dataset.taskNumber;
-            taskTitle.textContent = `${taskNumber}. ${newValue}`;
-            saveTasksToLocalStorage();
+        if (taskTitle) {
+            const newValue = prompt('Edit task:', taskTitle.textContent.split('. ')[1]);
+            if (newValue) {
+                const taskNumber = li.dataset.taskNumber;
+                taskTitle.textContent = `${taskNumber}. ${newValue}`;
+                saveTasksToLocalStorage();
+            }
         }
     }
 
     function deleteTask(button) {
         const li = button.closest('li');
-        li.remove();
-        saveTasksToLocalStorage();
+        if (li) {
+            li.remove();
+            saveTasksToLocalStorage();
+        }
     }
 
     function toggleComplete(button) {
         const li = button.closest('li');
-        li.classList.toggle('completed');
-        saveTasksToLocalStorage();
+        if (li) {
+            li.classList.toggle('completed');
+            saveTasksToLocalStorage();
+        }
     }
 
     function addSubtask(button) {
@@ -113,8 +119,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function deleteSubtask(button) {
         const subtaskLi = button.closest('li');
-        subtaskLi.remove();
-        saveTasksToLocalStorage();
+        if (subtaskLi) {
+            subtaskLi.remove();
+            saveTasksToLocalStorage();
+        }
     }
 
     function showAlert(message) {
@@ -133,21 +141,25 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function closeAlert(button) {
         const alertBox = button.closest('.custom-alert');
-        alertBox.remove();
+        if (alertBox) {
+            alertBox.remove();
+        }
     }
 
     function saveTasksToLocalStorage() {
         const tasks = [];
         taskList.querySelectorAll('li').forEach((li, index) => {
-            const taskTitle = li.querySelector('.task-title').textContent;
-            const startTime = li.querySelector('.start-time').value;
-            const hours = li.querySelector('.expected-hours').value;
-            const minutes = li.querySelector('.expected-minutes').value;
-            const date = li.querySelector('input[type="date"]').value;
-            const note = li.querySelector('.note textarea').value;
+            const taskTitle = li.querySelector('.task-title') ? li.querySelector('.task-title').textContent : '';
+            const startTime = li.querySelector('.start-time') ? li.querySelector('.start-time').value : '';
+            const hours = li.querySelector('.expected-hours') ? li.querySelector('.expected-hours').value : '';
+            const minutes = li.querySelector('.expected-minutes') ? li.querySelector('.expected-minutes').value : '';
+            const date = li.querySelector('input[type="date"]') ? li.querySelector('input[type="date"]').value : '';
+            const note = li.querySelector('.note textarea') ? li.querySelector('.note textarea').value : '';
             const subtasks = [];
             li.querySelectorAll('.subtask').forEach(subtask => {
-                subtasks.push(subtask.querySelector('.subtask-title').textContent.split('. ')[1]);
+                if (subtask.querySelector('.subtask-title')) {
+                    subtasks.push(subtask.querySelector('.subtask-title').textContent.split('. ')[1]);
+                }
             });
             tasks.push({ taskTitle, startTime, hours, minutes, date, note, subtasks });
         });

@@ -47,6 +47,8 @@ function createGoogleSheet(tasks) {
 
     return gapi.client.sheets.spreadsheets.create({
         resource: spreadsheet,
+    }).then(function (response) {
+        console.log('Spreadsheet created:', response);
     }).catch(function (error) {
         console.error('Error creating Google Sheet:', error);
     });
