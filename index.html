@@ -1,0 +1,33 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Planner App</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <div id="clock"></div>
+        <div id="pomodoro">
+            <button onclick="startPomodoro()">Start</button>
+            <button onclick="stopPomodoro()">Stop</button>
+            <button onclick="resetPomodoro()">Reset</button>
+            <div id="pomodoro-time">25:00</div>
+        </div>
+    </header>
+    <main>
+        <div id="planner">
+            <input type="text" id="task-input" placeholder="Add new task">
+            <button onclick="addTask()">Add Task</button>
+            <ul id="task-list"></ul>
+        </div>
+    </main>
+    <script src="js/config.js"></script>
+    <script src="js/clock.js"></script>
+    <script src="js/pomodoro.js"></script>
+    <script src="js/planner.js"></script>
+</body>
+</html>
+    
