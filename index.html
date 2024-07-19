@@ -1,33 +1,43 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daily Planner App</title>
+    <title>Daily Planner Plus</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <header>
-        <div id="clock"></div>
-        <div id="pomodoro">
-            <button onclick="startPomodoro()">Start</button>
-            <button onclick="stopPomodoro()">Stop</button>
-            <button onclick="resetPomodoro()">Reset</button>
-            <div id="pomodoro-time">25:00</div>
+        <h1>Daily Planner Plus</h1>
+        <div>
+            <button onclick="location.href='pomodoro.html'">Pomodoro Timer</button> <br><br>
+            <label class="switch">
+                <input type="checkbox" id="theme-toggle">
+                <span class="slider round"></span>
+            </label>
+            <span class="theme-text">Dark Mode</span>
         </div>
     </header>
     <main>
+        <div id="clock"></div>
         <div id="planner">
             <input type="text" id="task-input" placeholder="Add new task">
             <button onclick="addTask()">Add Task</button>
             <ul id="task-list"></ul>
         </div>
     </main>
+    <footer>
+        &copy; Daily Planner Plus<br>
+        Nimnada Kavishwara<br>
+        <small>
+            Undergraduate<br>
+            Department of Computer Science<br>
+            University of Ruhuna
+        </small>
+    </footer>
     <script src="js/config.js"></script>
     <script src="js/clock.js"></script>
-    <script src="js/pomodoro.js"></script>
     <script src="js/planner.js"></script>
+    <script src="js/theme.js"></script>
 </body>
 </html>
-    

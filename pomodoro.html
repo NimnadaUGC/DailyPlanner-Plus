@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pomodoro Timer</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/pomodoro.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+
+        <!-- Place this within the body tag -->
+        <audio id="alert-sound" src="sounds/alert.mp3" preload="auto"></audio>   
+
+    <header>
+        <h1>Pomodoro Timer</h1>
+    <div>
+        <button onclick="location.href='index.html'">Back to Planner</button> <br><br>
+        <label class="switch">
+            <input type="checkbox" id="theme-toggle">
+            <span class="slider round"></span>
+        </label>
+        <span class="theme-text">Dark Mode</span>
+    </div>
+    </header>
+    <main id="main-content">
+        <div id="pomodoro">
+            <div id="timer-box">
+                <div id="pomodoro-time">25:00</div>
+                <div id="progress-bar-container">
+                    <div id="progress-bar"></div>
+                </div>
+            </div>
+            <div id="pomodoro-buttons">
+                <button onclick="startPomodoro()"><i class="fas fa-play fa-2x"></i><br><small>Start</small></button>
+                <button onclick="stopPomodoro()"><i class="fas fa-stop fa-2x"></i><br><small>Stop</small></button>
+                <button onclick="resetPomodoro()"><i class="fas fa-redo fa-2x"></i><br><small>Reset</small></button>
+                <button onclick="resetAll()"><i class="fas fa-trash fa-2x"></i><br><small>Reset All</small></button>
+            </div>
+            <div id="session-box">
+                <p>Work Sessions Completed: <span id="work-sessions">0</span></p>
+            </div>
+        </div>
+        <div id="countdown-overlay" class="countdown-overlay overlay-hidden">
+            <div id="countdown"></div>
+        </div>
+        <div id="custom-alert" class="custom-alert overlay-hidden">
+            <div class="custom-alert-content">
+                <p id="custom-alert-message"></p>
+                <button id="alert-button-ok" class="custom-alert-button">OK</button>
+                <button id="alert-button-later" class="custom-alert-button button-hidden">Later</button>
+            </div>
+        </div>        
+    </main>
+    <footer>
+        &copy; Daily Planner Plus<br>
+        Nimnada Kavishwara<br>
+        <small>
+            Undergraduate<br>
+            Department of Computer Science<br>
+            University of Ruhuna
+        </small>
+    </footer>
+    <script src="js/config.js"></script>
+    <script src="js/pomodoro.js"></script>
+    <script src="js/theme.js"></script>
+</body>
+</html>
