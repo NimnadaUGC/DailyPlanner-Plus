@@ -3,7 +3,7 @@ let taskCounter = 0;
 document.addEventListener('DOMContentLoaded', function() {
     const taskInput = document.getElementById('task-input');
     const taskList = document.getElementById('task-list');
-    let taskCounter = loadTasksFromLocalStorage().length + 1;
+    taskCounter = loadTasksFromLocalStorage().length + 1;
 
     function addTask(taskValue = '') {
         if (taskValue.trim() === '' && taskInput.value.trim() === '') {
@@ -33,9 +33,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
                 <input type="date" value="${defaultDate}">
                 <div class="task-actions">
-                    <button class="edit" onclick="editTask(this)"><i class="fas fa-pencil-alt"></i></button>
-                    <button class="delete" onclick="deleteTask(this)"><i class="fas fa-times"></i></button>
-                    <button class="complete" onclick="toggleComplete(this)"><i class="fas fa-check"></i></button>
+                    <button class="edit" onclick="editTask(this)"><i class="fas fa-pencil-alt" style="color: orange;"></i></button>
+                    <button class="delete" onclick="deleteTask(this)"><i class="fas fa-times" style="color: red;"></i></button>
+                    <button class="complete" onclick="toggleComplete(this)"><i class="fas fa-check" style="color: green;"></i></button>
                 </div>
             </div>
             <div class="note">
@@ -52,7 +52,6 @@ document.addEventListener('DOMContentLoaded', function() {
         taskInput.value = '';
         taskCounter++;
         saveTasksToLocalStorage();
-        console.log('Google API Key:', config.googleApiKey);
     }
 
     function generateHoursOptions() {
@@ -105,7 +104,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const taskNumber = button.closest('li').dataset.taskNumber;
             const subtaskNumber = ul.children.length + 1;
             subtaskLi.className = 'subtask';
-            subtaskLi.innerHTML = `<span class="subtask-title">${taskNumber}.${subtaskNumber}</span> ${subtaskValue} <button class="delete" onclick="deleteSubtask(this)"><i class="fas fa-times"></i></button><hr>`;
+            subtaskLi.innerHTML = `<span class="subtask-title">${taskNumber}.${subtaskNumber}</span> ${subtaskValue} <button class="delete" onclick="deleteSubtask(this)"><i class="fas fa-times" style="color: red;"></i></button><hr>`;
             ul.appendChild(subtaskLi);
             subtaskInput.value = '';
             saveTasksToLocalStorage();
