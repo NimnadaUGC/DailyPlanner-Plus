@@ -8,19 +8,22 @@ function onGAPILoad() {
 
 function handleCredentialResponse(response) {
     const token = response.credential;
-    gapi.load('client', initGAPIClient);
 
-    function initGAPIClient() {
+    gapi.load('client', () => {
         gapi.client.init({
             clientId: config.googleClientId,
             discoveryDocs: ['https://sheets.googleapis.com/$discovery/rest?version=v4'],
             scope: 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.file',
         }).then(() => {
-            gapi.auth.setToken({ access_token: token });
+            gapi.client.setToken({ access_token: token });
+            // Now the Google API client is initialized, set up the buttons to work with it
+            document.querySelectorAll('.google-buttons button').forEach(button => {
+                button.disabled = false;
+            });
         }).catch(error => {
             console.error('Error initializing Google API client:', error);
         });
-    }
+    });
 }
 
 function createGoogleSheet(tasks) {
@@ -58,7 +61,7 @@ function createGoogleSheet(tasks) {
         resource: spreadsheet,
     }).then(response => {
         console.log('Spreadsheet created:', response);
-        return response;
+        return response.result.spreadsheetId;
     }).catch(error => {
         console.error('Error creating Google Sheet:', error);
     });
@@ -66,18 +69,23 @@ function createGoogleSheet(tasks) {
 
 function downloadGoogleSheet() {
     const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
-    createGoogleSheet(tasks).then(response => {
-        const url = `https://docs.google.com/spreadsheets/d/${response.result.spreadsheetId}/export?format=xlsx`;
+    createGoogleSheet(tasks).then(spreadsheetId => {
+        const url = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/export?format=xlsx`;
         window.open(url);
     });
 }
 
 function uploadToGoogleDrive() {
     const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
-    createGoogleSheet(tasks).then(response => {
+    createGoogleSheet(tasks).then(spreadsheetId => {
         console.log('Sheet created in your Google Drive');
     });
 }
 
 // Ensure the GIS script is loaded before initializing
-document.addEventListener('DOMContentLoaded', onGAPILoad);
+document.addEventListener('DOMContentLoaded', () => {
+    const script = document.createElement('script');
+    script.src = 'https://apis.google.com/js/api.js';
+    script.onload = onGAPILoad;
+    document.body.appendChild(script);
+});
