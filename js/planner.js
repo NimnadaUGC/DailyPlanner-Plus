@@ -166,6 +166,7 @@ document.addEventListener('DOMContentLoaded', function() {
     window.toggleComplete = toggleComplete;
     window.addSubtask = addSubtask;
     window.deleteSubtask = deleteSubtask;
+    window.closeAlert = closeAlert;
 
     loadTasksFromLocalStorage();
 });

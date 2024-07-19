@@ -11,8 +11,6 @@ function initClient() {
         gapi.auth2.getAuthInstance().signIn();
     }).catch(function (error) {
         console.error('Error initializing Google API client:', error);
-        // Optionally, you can define showAlert or use console.error as shown
-        console.error('Error initializing Google API client. Please check the console for more details.');
     });
 }
 
