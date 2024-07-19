@@ -4,7 +4,6 @@ function onGAPILoad() {
 
 function initClient() {
     gapi.client.init({
-        apiKey: config.googleApiKey,
         clientId: config.googleClientId,
         discoveryDocs: ['https://sheets.googleapis.com/$discovery/rest?version=v4'],
         scope: 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.file',
@@ -12,7 +11,8 @@ function initClient() {
         gapi.auth2.getAuthInstance().signIn();
     }).catch(function (error) {
         console.error('Error initializing Google API client:', error);
-        showAlert('Error initializing Google API client. Please check the console for more details.');
+        // Optionally, you can define showAlert or use console.error as shown
+        console.error('Error initializing Google API client. Please check the console for more details.');
     });
 }
 
@@ -51,7 +51,6 @@ function createGoogleSheet(tasks) {
         resource: spreadsheet,
     }).catch(function (error) {
         console.error('Error creating Google Sheet:', error);
-        showAlert('Error creating Google Sheet. Please check the console for more details.');
     });
 }
 
@@ -66,7 +65,7 @@ function downloadGoogleSheet() {
 function uploadToGoogleDrive() {
     const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
     createGoogleSheet(tasks).then(response => {
-        showAlert('Sheet created in your Google Drive');
+        console.log('Sheet created in your Google Drive');
     });
 }
 
