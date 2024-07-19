@@ -1,23 +1,29 @@
 function onGAPILoad() {
-    gapi.load('client:auth2', initClient);
+    google.accounts.id.initialize({
+        client_id: config.googleClientId,
+        callback: handleCredentialResponse,
+    });
+
+    google.accounts.id.prompt(); // Display the One Tap prompt
 }
 
-function initClient() {
-    gapi.client.init({
-        clientId: config.googleClientId,
-        discoveryDocs: ['https://sheets.googleapis.com/$discovery/rest?version=v4'],
-        scope: 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.file'
-    }).then(() => {
-        gapi.auth2.getAuthInstance().signIn().then(() => {
+function handleCredentialResponse(response) {
+    const token = response.credential;
+    console.log('Token received:', token);
+
+    gapi.load('client', () => {
+        gapi.client.init({
+            apiKey: config.googleClientId,
+            discoveryDocs: ['https://sheets.googleapis.com/$discovery/rest?version=v4'],
+            scope: 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.file'
+        }).then(() => {
             console.log('Google API client initialized');
             document.querySelectorAll('.google-buttons button').forEach(button => {
                 button.disabled = false;
             });
         }).catch(error => {
-            console.error('Error during sign-in:', error);
+            console.error('Error initializing Google API client:', error);
         });
-    }).catch(error => {
-        console.error('Error initializing Google API client:', error);
     });
 }
 
