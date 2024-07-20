@@ -1,98 +1,92 @@
-// Global variable to hold Google API client loaded status
 let googleAPIReady = false;
 
-function onGAPILoad() {
-    google.accounts.id.initialize({
-        client_id: config.googleClientId,
-        callback: handleCredentialResponse
-    });
+async function onGAPILoad() {
+    try {
+        google.accounts.id.initialize({ client_id: config.googleClientId, callback: handleCredentialResponse });
+        google.accounts.id.prompt();
 
-    google.accounts.id.prompt();
-
-    // Load the client library and initialize it
-    gapi.load('client:auth2', () => {
-        gapi.client.init({
+        await gapi.load('client:auth2');
+        await gapi.client.init({
             apiKey: config.apiKey,
             clientId: config.googleClientId,
             discoveryDocs: config.discoveryDocs,
             scope: config.scopes
-        }).then(() => {
-            console.log('Google API client initialized.');
-            loadSheetsAPI();
-        }, (error) => {
-            console.error('Error initializing Google API client:', error);
         });
-    });
-}
+        console.log('Google API client initialized.');
 
-function loadSheetsAPI() {
-    gapi.client.load('sheets', 'v4').then(() => {
-        console.log('Google Sheets API loaded.');
+        await gapi.client.load('sheets', 'v4');
+        console.log('Google Sheets API loaded successfully.');
+
         googleAPIReady = true;
-    }, (error) => {
-        console.error('Error loading Google Sheets API:', error);
-    });
+    } catch (error) {
+        console.error('Failed to initialize the Google APIs:', error);
+    }
 }
 
-function createGoogleSheet(tasks) {
+function handleCredentialResponse(response) {
+    console.log('Credentials received:', response);
+}
+
+async function createGoogleSheet(tasks) {
     if (!googleAPIReady) {
-        console.error('Google Sheets API is not ready.');
-        return;
+        console.error('Google Sheets API is not ready. Please wait...');
+        await onGAPILoad();
     }
 
-    const spreadsheetBody = {
-        properties: { title: 'Daily Planner Tasks' },
-        sheets: [{
-            properties: { title: 'Tasks' },
-            data: [{
-                startRow: 0,
-                startColumn: 0,
-                rowData: tasks.map(task => ({
-                    values: [
-                        { userEnteredValue: { stringValue: task.taskTitle } },
-                        { userEnteredValue: { stringValue: task.startTime } },
-                        { userEnteredValue: { stringValue: task.hours } },
-                        { userEnteredValue: { stringValue: task.minutes } },
-                        { userEnteredValue: { stringValue: task.date } },
-                        { userEnteredValue: { stringValue: task.note } },
-                        { userEnteredValue: { stringValue: task.subtasks.join(', ') } }
-                    ]
-                }))
+    try {
+        const spreadsheetBody = {
+            properties: { title: 'Daily Planner Tasks' },
+            sheets: [{
+                properties: { title: 'Tasks' },
+                data: [{
+                    startRow: 0,
+                    startColumn: 0,
+                    rowData: tasks.map(task => ({
+                        values: [
+                            { userEnteredValue: { stringValue: task.taskTitle } },
+                            { userEnteredValue: { stringValue: task.startTime } },
+                            { userEnteredValue: { stringValue: task.hours } },
+                            { userEnteredValue: { stringValue: task.minutes } },
+                            { userEnteredValue: { stringValue: task.date } },
+                            { userEnteredValue: { stringValue: task.note } },
+                            { userEnteredValue: { stringValue: task.subtasks.join(', ') } }
+                        ]
+                    }))
+                }]
             }]
-        }]
-    };
-
-    return gapi.client.sheets.spreadsheets.create({ resource: spreadsheetBody }).then(response => {
+        };
+        const response = await gapi.client.sheets.spreadsheets.create({ resource: spreadsheetBody });
         console.log('Spreadsheet created with ID:', response.result.spreadsheetId);
         return response.result.spreadsheetId;
-    }, error => {
+    } catch (error) {
         console.error('Error creating spreadsheet:', error);
-    });
+        return null;
+    }
 }
 
-function downloadGoogleSheet() {
+async function downloadGoogleSheet() {
     const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
     if (tasks.length === 0) {
         console.log('No tasks to download.');
         return;
     }
-    createGoogleSheet(tasks).then(spreadsheetId => {
-        if (spreadsheetId) {
-            const url = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/export?format=xlsx`;
-            window.open(url);
-        }
-    });
+
+    const spreadsheetId = await createGoogleSheet(tasks);
+    if (spreadsheetId) {
+        const url = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/export?format=xlsx`;
+        window.open(url);
+    }
 }
 
-function uploadToGoogleDrive() {
+async function uploadToGoogleDrive() {
     const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
     if (tasks.length === 0) {
         console.log('No tasks to upload.');
         return;
     }
-    createGoogleSheet(tasks).then(spreadsheetId => {
-        if (spreadsheetId) {
-            console.log('Spreadsheet uploaded to Google Drive with ID:', spreadsheetId);
-        }
-    });
+
+    const spreadsheetId = await createGoogleSheet(tasks);
+    if (spreadsheetId) {
+        console.log('Spreadsheet uploaded to Google Drive with ID:', spreadsheetId);
+    }
 }
