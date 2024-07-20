@@ -1,117 +1,93 @@
-// google.js
-// Assumes that config.js is properly included before this script in your HTML
+// Assumes the global `config` object contains necessary API keys and client IDs
+document.addEventListener('DOMContentLoaded', function() {
+    loadGoogleAPI();
+});
 
-function onGAPILoad() {
-    // Initialize Google Identity Services
-    google.accounts.id.initialize({
-        client_id: config.googleClientId,  // Ensure your config object correctly references your Google client ID
-        callback: handleCredentialResponse // This function is called after a user successfully logs in
-    });
-
-    // Prompt the user for signing in
-    google.accounts.id.prompt((notification) => {
-        if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-            console.log('The Google One Tap prompt was not displayed:', notification);
-            // You can handle situations here where the prompt is not shown (e.g., due to cookie settings)
-        }
-    });
-
-    // Load the Google API client library and initialize it
-    gapi.load('client:auth2', initClient);
+function loadGoogleAPI() {
+    gapi.load('client:auth2', initializeGAPI);
 }
 
-function initClient() {
+function initializeGAPI() {
     gapi.client.init({
-        apiKey: config.apiKey, // API key
-        clientId: config.googleClientId, // Same client ID used for GIS
-        discoveryDocs: config.discoveryDocs, // e.g., ['https://sheets.googleapis.com/$discovery/rest?version=v4']
-        scope: config.scopes // Scopes for the APIs your app will access
+        apiKey: config.apiKey,
+        clientId: config.googleClientId,
+        discoveryDocs: ["https://sheets.googleapis.com/$discovery/rest?version=v4"],
+        scope: 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.file'
     }).then(function () {
-        console.log('Google API client initialized.');
-        // Listen for sign-in state changes and handle the initial sign-in state
-        gapi.auth2.getAuthInstance().isSignedIn.listen(updateSigninStatus);
-        updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
+        console.log("Google API initialized successfully");
+        checkAuthStatus();
     }, function(error) {
-        console.error('Failed to initialize the Google API client:', error);
+        console.error("Error loading GAPI client for API", error);
     });
 }
 
-
-function handleCredentialResponse(response) {
-    console.log('Google Token ID Received:', response.credential);
-    // Initialize the Google API client library
-    gapi.load('client:auth2', () => {
-        gapi.client.init({
-            apiKey: config.apiKey,
-            clientId: config.googleClientId,
-            discoveryDocs: config.discoveryDocs,
-            scope: config.scopes
-        }).then(() => {
-            console.log('GAPI client initialized.');
-            // Listen for sign-in state changes
-            gapi.auth2.getAuthInstance().isSignedIn.listen(updateSigninStatus);
-            // Handle the initial sign-in state
-            updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
-        });
-    });
+function checkAuthStatus() {
+    // Check if the user is already signed in
+    gapi.auth2.getAuthInstance().isSignedIn.listen(updateSignInStatus);
+    updateSignInStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
 }
 
-function updateSigninStatus(isSignedIn) {
+function updateSignInStatus(isSignedIn) {
     if (isSignedIn) {
-        console.log('User is signed in.');
+        console.log("User is signed in.");
     } else {
-        console.log('User is not signed in.');
+        console.log("User is not signed in.");
+        gapi.auth2.getAuthInstance().signIn();
     }
 }
 
+function uploadToGoogleDrive() {
+    const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+    createGoogleSheet(tasks).then(sheetId => {
+        console.log('Google Sheet created with ID:', sheetId);
+        handleTasksProcessed(); // Clear tasks after upload
+    }).catch(error => {
+        console.error("Failed to create Google Sheet", error);
+    });
+}
+
+function downloadGoogleSheet() {
+    const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+    createGoogleSheet(tasks).then(sheetId => {
+        const url = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=xlsx`;
+        window.open(url);
+        handleTasksProcessed(); // Clear tasks after download
+    }).catch(error => {
+        console.error("Failed to download Google Sheet", error);
+    });
+}
+
 function createGoogleSheet(tasks) {
-    const spreadsheet = {
-        properties: {
-            title: 'Daily Planner',
-        },
+    const body = {
+        properties: { title: 'Task Sheet' },
         sheets: [{
-            properties: {
-                title: 'Tasks',
-            },
+            properties: { title: 'Tasks' },
             data: [{
                 startRow: 0,
                 startColumn: 0,
                 rowData: tasks.map(task => ({
                     values: [
-                        { userEnteredValue: { stringValue: task.taskTitle } },
-                        { userEnteredValue: { stringValue: task.startTime } },
-                        { userEnteredValue: { stringValue: task.hours } },
-                        { userEnteredValue: { stringValue: task.minutes } },
-                        { userEnteredValue: { stringValue: task.date } },
-                        { userEnteredValue: { stringValue: task.note } },
-                        { userEnteredValue: { stringValue: task.subtasks.join(', ') } },
-                    ],
-                })),
-            }],
+                        { userEnteredValue: { stringValue: task.taskTitle }},
+                        { userEnteredValue: { stringValue: task.startTime }},
+                        { userEnteredValue: { stringValue: task.hours }},
+                        { userEnteredValue: { stringValue: task.minutes }},
+                        { userEnteredValue: { stringValue: task.date }},
+                        { userEnteredValue: { stringValue: task.note }},
+                        { userEnteredValue: { stringValue: task.subtasks.join(', ') }},
+                    ]
+                }))
+            }]
         }]
     };
 
-    return gapi.client.sheets.spreadsheets.create({ resource: spreadsheet })
-        .then(response => {
-            console.log('Spreadsheet created with ID:', response.result.spreadsheetId);
-            return response.result.spreadsheetId;
-        })
-        .catch(error => {
-            console.error('Error creating Google Sheet:', error);
-        });
+    return gapi.client.sheets.spreadsheets.create({ resource: body }).then(response => response.result.spreadsheetId);
 }
 
-function downloadGoogleSheet() {
-    const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
-    createGoogleSheet(tasks).then(spreadsheetId => {
-        const url = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/export?format=xlsx`;
-        window.open(url);
-    });
-}
-
-function uploadToGoogleDrive() {
-    const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
-    createGoogleSheet(tasks).then(spreadsheetId => {
-        console.log('Sheet created and uploaded to your Google Drive with ID:', spreadsheetId);
-    });
+// Placeholder function to simulate the clearing of tasks
+function handleTasksProcessed() {
+    console.log("Tasks have been processed and cleared.");
+    // Assuming there's a global function in planner.js or similar
+    if (typeof clearAllTasks === 'function') {
+        clearAllTasks();
+    }
 }

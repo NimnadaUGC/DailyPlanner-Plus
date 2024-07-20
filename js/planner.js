@@ -3,10 +3,12 @@ let taskCounter = 0;
 document.addEventListener('DOMContentLoaded', function() {
     const taskInput = document.getElementById('task-input');
     const taskList = document.getElementById('task-list');
-    taskCounter = loadTasksFromLocalStorage().length + 1;
+    const loadedTasks = loadTasksFromLocalStorage();
+    taskCounter = loadedTasks.length + 1;
+    loadedTasks.forEach(task => addTask(task.taskTitle));
 
     function addTask(taskValue = '') {
-        if (taskValue.trim() === '' && taskInput.value.trim() === '') {
+        if (!taskValue.trim() && !taskInput.value.trim()) {
             showAlert('Please enter a task.');
             return;
         }
@@ -33,9 +35,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
                 <input type="date" value="${defaultDate}">
                 <div class="task-actions">
-                    <button class="edit" onclick="editTask(this)"><i class="fas fa-pencil-alt" style="color: orange;"></i></button>
-                    <button class="delete" onclick="deleteTask(this)"><i class="fas fa-times" style="color: red;"></i></button>
-                    <button class="complete" onclick="toggleComplete(this)"><i class="fas fa-check" style="color: green;"></i></button>
+                    <button class="edit" onclick="editTask(this)">Edit</button>
+                    <button class="delete" onclick="deleteTask(this)">Delete</button>
+                    <button class="complete" onclick="toggleComplete(this)">Complete</button>
                 </div>
             </div>
             <div class="note">
@@ -47,27 +49,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 <button onclick="addSubtask(this)">Add Subtask</button>
             </div>
         `;
-        li.dataset.taskNumber = taskCounter; // Store the task number for subtasks
+        li.dataset.taskNumber = taskCounter;
         taskList.appendChild(li);
         taskInput.value = '';
         taskCounter++;
         saveTasksToLocalStorage();
     }
-
-    function clearAllTasks() {
-        localStorage.removeItem('tasks');
-        taskList.innerHTML = '';
-        taskCounter = 1;
-    }
-
-    // Call this function after tasks are successfully uploaded or downloaded
-    function handleTasksProcessed() {
-        clearAllTasks();
-        showAlert('Tasks have been processed and cleared.');
-    }
-
-    // Integration with download/upload functions to be defined or adjusted accordingly
-    // Example: call handleTasksProcessed() after successful upload/download
 
     function generateHoursOptions() {
         let options = '';
@@ -126,7 +113,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function showAlert(message) {
-        alert(message); // Simplified alert for clarity
+        alert(message);
     }
 
     function saveTasksToLocalStorage() {
@@ -146,8 +133,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function loadTasksFromLocalStorage() {
         const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
-        tasks.forEach(task => addTask(task.taskTitle));
+        return tasks.map(task => ({
+            taskTitle: task.taskTitle,
+            startTime: task.startTime,
+            hours: task.hours,
+            minutes: task.minutes,
+            date: task.date,
+            note: task.note,
+            subtasks: task.subtasks
+        }));
     }
-
-    loadTasksFromLocalStorage();
 });
