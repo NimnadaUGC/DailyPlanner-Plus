@@ -10,6 +10,7 @@ function onGAPILoad() {
         }
     });
 
+    // Load the Google API client library and the auth2 library together
     gapi.load('client:auth2', initClient);
 }
 
@@ -21,27 +22,19 @@ function initClient() {
         scope: config.scopes
     }).then(function () {
         console.log('Google API client initialized.');
+        // Now load the Sheets API
+        return gapi.client.load('sheets', 'v4');
+    }).then(function() {
+        console.log('Google Sheets API loaded.');
         gapi.auth2.getAuthInstance().isSignedIn.listen(updateSigninStatus);
         updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
-    }, function (error) {
-        console.error('Failed to initialize the Google API client:', error);
+    }, function(error) {
+        console.error('Failed to initialize the Google API client or load the Sheets API:', error);
     });
 }
 
 function handleCredentialResponse(response) {
     console.log('Google Token ID Received:', response.credential);
-    gapi.load('client:auth2', () => {
-        gapi.client.init({
-            apiKey: config.apiKey,
-            clientId: config.googleClientId,
-            discoveryDocs: config.discoveryDocs,
-            scope: config.scopes
-        }).then(() => {
-            console.log('GAPI client initialized.');
-            gapi.auth2.getAuthInstance().isSignedIn.listen(updateSigninStatus);
-            updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
-        });
-    });
 }
 
 function updateSigninStatus(isSignedIn) {
@@ -53,11 +46,6 @@ function updateSigninStatus(isSignedIn) {
 }
 
 function createGoogleSheet(tasks) {
-    if (!gapi.client.sheets) {
-        console.error('Google Sheets API is not loaded.');
-        return;
-    }
-
     const spreadsheet = {
         properties: {
             title: 'Daily Planner',
