@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', function() {
     loadedTasks.forEach(task => addTask(task.taskTitle));
 
     function addTask(taskValue = '') {
-        if (!taskValue.trim() && !taskInput.value.trim()) {
+        if (taskValue.trim() === '' && taskInput.value.trim() === '') {
             showAlert('Please enter a task.');
             return;
         }
@@ -35,9 +35,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
                 <input type="date" value="${defaultDate}">
                 <div class="task-actions">
-                    <button class="edit" onclick="editTask(this)">Edit</button>
-                    <button class="delete" onclick="deleteTask(this)">Delete</button>
-                    <button class="complete" onclick="toggleComplete(this)">Complete</button>
+                    <button class="edit" onclick="editTask(this)"><i class="fas fa-pencil-alt" style="color: orange;"></i></button>
+                    <button class="delete" onclick="deleteTask(this)"><i class="fas fa-times" style="color: red;"></i></button>
+                    <button class="complete" onclick="toggleComplete(this)"><i class="fas fa-check" style="color: green;"></i></button>
                 </div>
             </div>
             <div class="note">
@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <button onclick="addSubtask(this)">Add Subtask</button>
             </div>
         `;
-        li.dataset.taskNumber = taskCounter;
+        li.dataset.taskNumber = taskCounter; // Store the task number for subtasks
         taskList.appendChild(li);
         taskInput.value = '';
         taskCounter++;
@@ -59,7 +59,8 @@ document.addEventListener('DOMContentLoaded', function() {
     function generateHoursOptions() {
         let options = '';
         for (let h = 1; h <= 12; h++) {
-            options += `<option value="${h}">${h}h</option>`;
+            const hour = h.toString().padStart(2, '0');
+            options += `<option value="${hour}">${hour}h</option>`;
         }
         return options;
     }
@@ -67,7 +68,8 @@ document.addEventListener('DOMContentLoaded', function() {
     function generateMinutesOptions() {
         let options = '';
         for (let m = 0; m < 60; m += 5) {
-            options += `<option value="${m}">${m}m</option>`;
+            const minute = m.toString().padStart(2, '0');
+            options += `<option value="${minute}">${minute}m</option>`;
         }
         return options;
     }
@@ -75,31 +77,42 @@ document.addEventListener('DOMContentLoaded', function() {
     function editTask(button) {
         const li = button.closest('li');
         const taskTitle = li.querySelector('.task-title');
-        const newValue = prompt('Edit task:', taskTitle.textContent.split('. ')[1]);
-        if (newValue) {
-            taskTitle.textContent = `${li.dataset.taskNumber}. ${newValue}`;
-            saveTasksToLocalStorage();
+        if (taskTitle) {
+            const newValue = prompt('Edit task:', taskTitle.textContent.split('. ')[1]);
+            if (newValue) {
+                const taskNumber = li.dataset.taskNumber;
+                taskTitle.textContent = `${taskNumber}. ${newValue}`;
+                saveTasksToLocalStorage();
+            }
         }
     }
 
     function deleteTask(button) {
         const li = button.closest('li');
-        li.remove();
-        saveTasksToLocalStorage();
+        if (li) {
+            li.remove();
+            saveTasksToLocalStorage();
+        }
     }
 
     function toggleComplete(button) {
         const li = button.closest('li');
-        li.classList.toggle('completed');
-        saveTasksToLocalStorage();
+        if (li) {
+            li.classList.toggle('completed');
+            saveTasksToLocalStorage();
+        }
     }
 
     function addSubtask(button) {
         const subtaskInput = button.previousElementSibling;
-        if (subtaskInput.value.trim()) {
+        const subtaskValue = subtaskInput.value.trim();
+        if (subtaskValue) {
             const ul = button.closest('li').querySelector('.subtask-list');
             const subtaskLi = document.createElement('li');
-            subtaskLi.innerHTML = `<span>${subtaskInput.value.trim()}</span> <button onclick="deleteSubtask(this)">Remove</button>`;
+            const taskNumber = button.closest('li').dataset.taskNumber;
+            const subtaskNumber = ul.children.length + 1;
+            subtaskLi.className = 'subtask';
+            subtaskLi.innerHTML = `<span class="subtask-title">${taskNumber}.${subtaskNumber}</span> ${subtaskValue} <button class="delete" onclick="deleteSubtask(this)"><i class="fas fa-times" style="color: red;"></i></button><hr>`;
             ul.appendChild(subtaskLi);
             subtaskInput.value = '';
             saveTasksToLocalStorage();
@@ -107,13 +120,32 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function deleteSubtask(button) {
-        const li = button.closest('li');
-        li.remove();
-        saveTasksToLocalStorage();
+        const subtaskLi = button.closest('li');
+        if (subtaskLi) {
+            subtaskLi.remove();
+            saveTasksToLocalStorage();
+        }
     }
 
     function showAlert(message) {
-        alert(message);
+        const alertBox = document.createElement('div');
+        alertBox.className = 'custom-alert';
+        alertBox.innerHTML = `
+            <p>${message}</p>
+            <button onclick="closeAlert(this)">OK</button>
+        `;
+        document.body.appendChild(alertBox);
+        alertBox.style.display = 'block';
+        if (document.body.classList.contains('dark-mode')) {
+            alertBox.classList.add('dark-mode');
+        }
+    }
+
+    function closeAlert(button) {
+        const alertBox = button.closest('.custom-alert');
+        if (alertBox) {
+            alertBox.remove();
+        }
     }
 
     function saveTasksToLocalStorage() {
@@ -133,14 +165,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function loadTasksFromLocalStorage() {
         const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
-        return tasks.map(task => ({
-            taskTitle: task.taskTitle,
-            startTime: task.startTime,
-            hours: task.hours,
-            minutes: task.minutes,
-            date: task.date,
-            note: task.note,
-            subtasks: task.subtasks
-        }));
+        tasks.forEach(task => addTask(task.taskTitle));
     }
+
+    loadTasksFromLocalStorage();
+
+    window.addTask = addTask;
+    window.editTask = editTask;
+    window.deleteTask = deleteTask;
+    window.toggleComplete = toggleComplete;
+    window.addSubtask = addSubtask;
+    window.deleteSubtask = deleteSubtask;
+    window.closeAlert = closeAlert;
+
 });
