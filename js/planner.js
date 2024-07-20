@@ -1,33 +1,37 @@
 let taskCounter = 0;
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const taskInput = document.getElementById('task-input');
     const taskList = document.getElementById('task-list');
-    taskCounter = loadTasksFromLocalStorage().length + 1;
+    const storedTasks = loadTasksFromLocalStorage();
+    taskCounter = storedTasks.length + 1;
 
-    function addTask(taskValue = '') {
-        if (taskValue.trim() === '' && taskInput.value.trim() === '') {
+    storedTasks.forEach(task => addTask(task.taskTitle, task.startTime, task.hours, task.minutes, task.date, task.note, task.subtasks));
+
+    function addTask(taskTitle = '', startTime = '', hours = '01', minutes = '00', date = '', note = '', subtasks = []) {
+        if (taskTitle.trim() === '' && taskInput.value.trim() === '') {
             showAlert('Please enter a task.');
             return;
         }
-        const taskText = taskValue || taskInput.value.trim();
+
+        const taskText = taskTitle || taskInput.value.trim();
         const li = document.createElement('li');
         const tomorrow = new Date();
         tomorrow.setDate(tomorrow.getDate() + 1);
-        const defaultDate = tomorrow.toISOString().split('T')[0];
+        const defaultDate = date || tomorrow.toISOString().split('T')[0];
 
         li.innerHTML = `
             <div class="task-main">
                 <span class="task-title">${taskCounter}. ${taskText}</span>
                 <br>
                 <div class="task-time">
-                    <label>Start Time: <input type="time" class="start-time"></label>
+                    <label>Start Time: <input type="time" class="start-time" value="${startTime}"></label>
                     <label>Expected Duration: 
                         <select class="expected-hours">
-                            ${generateHoursOptions()}
+                            ${generateHoursOptions(hours)}
                         </select>
                         <select class="expected-minutes">
-                            ${generateMinutesOptions()}
+                            ${generateMinutesOptions(minutes)}
                         </select>
                     </label>
                 </div>
@@ -39,9 +43,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
             </div>
             <div class="note">
-                <textarea placeholder="Add a note"></textarea>
+                <textarea placeholder="Add a note">${note}</textarea>
             </div>
-            <ul class="subtask-list"></ul>
+            <ul class="subtask-list">
+                ${subtasks.map(subtask => `<li class="subtask"><span class="subtask-title">${subtask}</span> <button class="delete" onclick="deleteSubtask(this)"><i class="fas fa-times" style="color: red;"></i></button><hr></li>`).join('')}
+            </ul>
             <div class="subtask-input">
                 <input type="text" placeholder="Add subtask">
                 <button onclick="addSubtask(this)">Add Subtask</button>
@@ -54,20 +60,20 @@ document.addEventListener('DOMContentLoaded', function() {
         saveTasksToLocalStorage();
     }
 
-    function generateHoursOptions() {
+    function generateHoursOptions(selectedHour) {
         let options = '';
         for (let h = 1; h <= 12; h++) {
             const hour = h.toString().padStart(2, '0');
-            options += `<option value="${hour}">${hour}h</option>`;
+            options += `<option value="${hour}" ${selectedHour === hour ? 'selected' : ''}>${hour}h</option>`;
         }
         return options;
     }
 
-    function generateMinutesOptions() {
+    function generateMinutesOptions(selectedMinute) {
         let options = '';
         for (let m = 0; m < 60; m += 5) {
             const minute = m.toString().padStart(2, '0');
-            options += `<option value="${minute}">${minute}m</option>`;
+            options += `<option value="${minute}" ${selectedMinute === minute ? 'selected' : ''}>${minute}m</option>`;
         }
         return options;
     }
@@ -148,7 +154,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function saveTasksToLocalStorage() {
         const tasks = [];
-        taskList.querySelectorAll('li').forEach((li, index) => {
+        taskList.querySelectorAll('li').forEach(li => {
             const taskTitle = li.querySelector('.task-title') ? li.querySelector('.task-title').textContent : '';
             const startTime = li.querySelector('.start-time') ? li.querySelector('.start-time').value : '';
             const hours = li.querySelector('.expected-hours') ? li.querySelector('.expected-hours').value : '';
@@ -158,7 +164,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const subtasks = [];
             li.querySelectorAll('.subtask').forEach(subtask => {
                 if (subtask.querySelector('.subtask-title')) {
-                    subtasks.push(subtask.querySelector('.subtask-title').textContent.split('. ')[1]);
+                    subtasks.push(subtask.querySelector('.subtask-title').textContent);
                 }
             });
             tasks.push({ taskTitle, startTime, hours, minutes, date, note, subtasks });
@@ -167,9 +173,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function loadTasksFromLocalStorage() {
-        const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
-        tasks.forEach(task => addTask(task.taskTitle));
-        return tasks;
+        return JSON.parse(localStorage.getItem('tasks')) || [];
     }
 
     window.addTask = addTask;
@@ -180,5 +184,10 @@ document.addEventListener('DOMContentLoaded', function() {
     window.deleteSubtask = deleteSubtask;
     window.closeAlert = closeAlert;
 
-    loadTasksFromLocalStorage();
+    // Clear local storage after downloading or uploading tasks
+    window.clearTasksAfterAction = function() {
+        localStorage.removeItem('tasks');
+        taskList.innerHTML = '';
+        taskCounter = 1;
+    };
 });
