@@ -3,9 +3,7 @@ let taskCounter = 0;
 document.addEventListener('DOMContentLoaded', function() {
     const taskInput = document.getElementById('task-input');
     const taskList = document.getElementById('task-list');
-    const loadedTasks = loadTasksFromLocalStorage();
-    taskCounter = loadedTasks.length + 1;
-    loadedTasks.forEach(task => addTask(task.taskTitle));
+    taskCounter = loadTasksFromLocalStorage().length + 1;
 
     function addTask(taskValue = '') {
         if (taskValue.trim() === '' && taskInput.value.trim() === '') {
