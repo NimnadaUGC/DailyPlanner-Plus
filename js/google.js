@@ -53,6 +53,11 @@ function updateSigninStatus(isSignedIn) {
 }
 
 function createGoogleSheet(tasks) {
+    if (!gapi.client.sheets) {
+        console.error('Google Sheets API is not loaded.');
+        return;
+    }
+
     const spreadsheet = {
         properties: {
             title: 'Daily Planner',
@@ -92,16 +97,20 @@ function createGoogleSheet(tasks) {
 function downloadGoogleSheet() {
     const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
     createGoogleSheet(tasks).then(spreadsheetId => {
-        const url = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/export?format=xlsx`;
-        window.open(url);
-        clearTasksAfterAction();
+        if (spreadsheetId) {
+            const url = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/export?format=xlsx`;
+            window.open(url);
+            clearTasksAfterAction();
+        }
     });
 }
 
 function uploadToGoogleDrive() {
     const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
     createGoogleSheet(tasks).then(spreadsheetId => {
-        console.log('Sheet created and uploaded to your Google Drive with ID:', spreadsheetId);
-        clearTasksAfterAction();
+        if (spreadsheetId) {
+            console.log('Sheet created and uploaded to your Google Drive with ID:', spreadsheetId);
+            clearTasksAfterAction();
+        }
     });
 }
