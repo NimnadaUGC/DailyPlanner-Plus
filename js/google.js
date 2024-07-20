@@ -1,3 +1,6 @@
+// Global variable to hold Google API client loaded status
+let googleAPIReady = false;
+
 function onGAPILoad() {
     google.accounts.id.initialize({
         client_id: config.googleClientId,
@@ -6,53 +9,41 @@ function onGAPILoad() {
 
     google.accounts.id.prompt();
 
-    // Load the auth2 library and Google Sheets API
-    gapi.load('client:auth2', initClient);
-}
-
-function initClient() {
-    gapi.client.init({
-        apiKey: config.apiKey,
-        clientId: config.googleClientId,
-        discoveryDocs: config.discoveryDocs,
-        scope: config.scopes
-    })
-    .then(function () {
-        console.log('Google API client initialized.');
-        // Load the Google Sheets API explicitly
-        return gapi.client.load('sheets', 'v4');
-    })
-    .then(function() {
-        console.log('Google Sheets API loaded successfully.');
-        gapi.auth2.getAuthInstance().isSignedIn.listen(updateSigninStatus);
-        updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
-    }, function(error) {
-        console.error('Failed to load Google Sheets API:', error);
+    // Load the client library and initialize it
+    gapi.load('client:auth2', () => {
+        gapi.client.init({
+            apiKey: config.apiKey,
+            clientId: config.googleClientId,
+            discoveryDocs: config.discoveryDocs,
+            scope: config.scopes
+        }).then(() => {
+            console.log('Google API client initialized.');
+            loadSheetsAPI();
+        }, (error) => {
+            console.error('Error initializing Google API client:', error);
+        });
     });
 }
 
-function handleCredentialResponse(response) {
-    console.log('Credential response received:', response);
-}
-
-function updateSigninStatus(isSignedIn) {
-    console.log('Sign-in status updated:', isSignedIn ? 'Signed in' : 'Signed out');
+function loadSheetsAPI() {
+    gapi.client.load('sheets', 'v4').then(() => {
+        console.log('Google Sheets API loaded.');
+        googleAPIReady = true;
+    }, (error) => {
+        console.error('Error loading Google Sheets API:', error);
+    });
 }
 
 function createGoogleSheet(tasks) {
-    if (!gapi.client.sheets) {
-        console.error('Google Sheets API is not available.');
+    if (!googleAPIReady) {
+        console.error('Google Sheets API is not ready.');
         return;
     }
 
     const spreadsheetBody = {
-        properties: {
-            title: 'Daily Planner Tasks'
-        },
+        properties: { title: 'Daily Planner Tasks' },
         sheets: [{
-            properties: {
-                title: 'Tasks'
-            },
+            properties: { title: 'Tasks' },
             data: [{
                 startRow: 0,
                 startColumn: 0,
@@ -64,20 +55,19 @@ function createGoogleSheet(tasks) {
                         { userEnteredValue: { stringValue: task.minutes } },
                         { userEnteredValue: { stringValue: task.date } },
                         { userEnteredValue: { stringValue: task.note } },
-                        { userEnteredValue: { stringValue: task.subtasks.join(', ') } },
+                        { userEnteredValue: { stringValue: task.subtasks.join(', ') } }
                     ]
                 }))
             }]
         }]
     };
 
-    return gapi.client.sheets.spreadsheets.create({ resource: spreadsheetBody })
-        .then(response => {
-            console.log('Spreadsheet created with ID:', response.result.spreadsheetId);
-            return response.result.spreadsheetId;
-        }, error => {
-            console.error('Error creating spreadsheet:', error);
-        });
+    return gapi.client.sheets.spreadsheets.create({ resource: spreadsheetBody }).then(response => {
+        console.log('Spreadsheet created with ID:', response.result.spreadsheetId);
+        return response.result.spreadsheetId;
+    }, error => {
+        console.error('Error creating spreadsheet:', error);
+    });
 }
 
 function downloadGoogleSheet() {
