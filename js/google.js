@@ -2,12 +2,40 @@
 // Assumes that config.js is properly included before this script in your HTML
 
 function onGAPILoad() {
+    // Initialize Google Identity Services
     google.accounts.id.initialize({
-        client_id: config.googleClientId,
-        callback: handleCredentialResponse
+        client_id: config.googleClientId,  // Ensure your config object correctly references your Google client ID
+        callback: handleCredentialResponse // This function is called after a user successfully logs in
     });
-    google.accounts.id.prompt(); // Show the One Tap sign-in prompt
+
+    // Prompt the user for signing in
+    google.accounts.id.prompt((notification) => {
+        if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+            console.log('The Google One Tap prompt was not displayed:', notification);
+            // You can handle situations here where the prompt is not shown (e.g., due to cookie settings)
+        }
+    });
+
+    // Load the Google API client library and initialize it
+    gapi.load('client:auth2', initClient);
 }
+
+function initClient() {
+    gapi.client.init({
+        apiKey: config.apiKey, // API key
+        clientId: config.googleClientId, // Same client ID used for GIS
+        discoveryDocs: config.discoveryDocs, // e.g., ['https://sheets.googleapis.com/$discovery/rest?version=v4']
+        scope: config.scopes // Scopes for the APIs your app will access
+    }).then(function () {
+        console.log('Google API client initialized.');
+        // Listen for sign-in state changes and handle the initial sign-in state
+        gapi.auth2.getAuthInstance().isSignedIn.listen(updateSigninStatus);
+        updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
+    }, function(error) {
+        console.error('Failed to initialize the Google API client:', error);
+    });
+}
+
 
 function handleCredentialResponse(response) {
     console.log('Google Token ID Received:', response.credential);
