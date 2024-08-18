@@ -1,12 +1,154 @@
-body {
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap');
+
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    font-family: 'Montserrat', sans-serif;
+    transition: background-color 0.3s, color 0.3s;
+    display: flex;
+    flex-direction: column;
+}
+
+body.light-mode {
+    background-color: #F0F0F0;
+    color: #333;
+}
+
+body.dark-mode {
+    background-color: #121212;
+    color: #ffffff;
+}
+
+header {
+    background-color: #2196F3;
+    padding: 20px;
+    text-align: center;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+header.dark-mode {
+    background-color: #333;
+    color: #ffffff;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 1.8em;
+}
+
+header button {
+    margin-left: 10px;
+    padding: 10px 20px;
+    border: none;
+    background-color: #FFC107;
+    color: #333;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1em;
     font-family: inherit;
-    font-size: 14px; /* Reduced overall font size */
+    transition: background-color 0.3s, color 0.3s;
+}
+
+header button:hover {
+    background-color: #FFA000;
+}
+
+header.dark-mode button {
+    background-color: #555;
+    color: #ffffff;
+}
+
+header.dark-mode button:hover {
+    background-color: #777;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 40px;
+    height: 22px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.theme-toggle {
+    display: flex;
+    align-items: center;
+}
+
+.theme-toggle .theme-text {
+    margin-left: 10px;
+    font-size: 1em;
+    color: #FFC107;
+    transition: color 0.3s;
+}
+
+body.dark-mode .theme-toggle .theme-text {
+    color: #FFD700;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #FFC107;
+    transition: 0.4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 4px;
+    bottom: 3px;
+    background-color: white;
+    transition: 0.4s;
+}
+
+input:checked + .slider {
+    background-color: #FFC107;
+}
+
+input:checked + .slider:before {
+    transform: translateX(16px);
+    background-color: white;
+}
+
+.slider.round {
+    border-radius: 34px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+
+main {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 1.2em;
+    flex: 1;
 }
 
 #planner {
     margin-top: 20px;
     width: 100%;
-    max-width: 90%; /* Increased maximum width for planner */
+    max-width: 90%;
     overflow-y: auto;
     max-height: 500px;
     padding: 10px;
@@ -91,7 +233,7 @@ body.dark-mode .planner-input button:hover {
     margin-top: 10px;
     list-style-type: none;
     padding: 0;
-    width: 100%; /* Ensure task list takes full width of the planner */
+    width: 100%;
 }
 
 #task-list li {
@@ -118,13 +260,13 @@ body.dark-mode #task-list li {
 }
 
 .task-title {
-    font-size: 1.2em; /* Increased font size for task title */
-    font-weight: bold; /* Make task title bold */
-    margin-bottom: 10px; /* Add space between task title and other sections */
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-bottom: 10px;
 }
 
 .subtask-title {
-    font-weight: bold; /* Highlight subtask titles */
+    font-weight: bold;
 }
 
 #task-list .task-actions {
@@ -164,8 +306,8 @@ body.dark-mode .task-actions button:hover {
 
 #task-list .note textarea {
     font-family: inherit;
-    width: 400%; /* Four times the current size */
-    max-width: 100%; /* Ensure it is responsive */
+    width: 400%;
+    max-width: 100%;
     padding: 10px;
     margin-top: 5px;
     border: 1px solid #ccc;
@@ -173,7 +315,7 @@ body.dark-mode .task-actions button:hover {
     background: white;
     color: black;
     resize: vertical;
-    height: 100px; /* Larger text area for notes */
+    height: 100px;
 }
 
 body.dark-mode #task-list .note textarea {
@@ -186,11 +328,11 @@ body.dark-mode #task-list .note textarea {
     margin-top: 10px;
     padding-left: 20px;
     list-style-type: decimal;
-    font-size: 0.9em; /* Smaller font size for subtasks */
+    font-size: 0.9em;
 }
 
 .subtask hr {
-    width: 100%; /* Ensure the horizontal line takes full width */
+    width: 100%;
     border: none;
     border-top: 1px solid #ccc;
     margin-top: 10px;
@@ -204,7 +346,7 @@ body.dark-mode .subtask hr {
     display: flex;
     margin-top: 10px;
     width: 100%;
-    font-size: 0.9em; /* Smaller font size for subtasks input */
+    font-size: 0.9em;
 }
 
 .subtask-input input[type="text"] {
@@ -232,7 +374,7 @@ body.dark-mode .subtask-input input[type="text"] {
     color: white;
     border-radius: 4px;
     cursor: pointer;
-    font-size: 0.9em; /* Smaller button for subtasks */
+    font-size: 0.9em;
     transition: background-color 0.3s;
 }
 
@@ -250,7 +392,7 @@ body.dark-mode .subtask-input button:hover {
 }
 
 .subtask-input .delete {
-    font-size: 0.8em; /* Smaller delete button */
+    font-size: 0.8em;
     color: red;
 }
 
@@ -259,7 +401,7 @@ body.dark-mode .subtask-input button:hover {
 }
 
 .subtask-list .delete {
-    font-size: 0.8em; /* Smaller delete button */
+    font-size: 0.8em;
     color: red;
     margin-left: 10px;
 }
@@ -337,28 +479,92 @@ body.dark-mode .custom-alert button:hover {
     justify-content: space-between;
 }
 
-.google-buttons button {
-    padding: 10px 20px;
-    border: none;
-    background-color: #2196F3;
-    color: white;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 1em;
-    font-family: inherit; /* Inherit font */
-    transition: background-color 0.3s, color 0.3s;
+.dropdown {
+    position: relative;
+    display: inline-block;
 }
 
-.google-buttons button:hover {
+.dropbtn {
+    background-color: #2196F3;
+    color: white;
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+}
+
+.dropdown-content a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+}
+
+.dropdown-content a:hover {
+    background-color: #f1f1f1;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+.dropdown:hover .dropbtn {
     background-color: #1976D2;
 }
 
-body.dark-mode .google-buttons button {
+body.dark-mode .dropdown-content {
+    background-color: #333;
+    color: white;
+    box-shadow: 0px 8px 16px 0px rgba(255, 255, 255, 0.2);
+}
+
+body.dark-mode .dropdown-content a {
+    color: white;
+}
+
+body.dark-mode .dropdown-content a:hover {
+    background-color: #444;
+}
+
+body.dark-mode .dropbtn {
     background-color: #FFC107;
     color: black;
 }
 
-body.dark-mode .google-buttons button:hover {
+body.dark-mode .dropbtn:hover {
     background-color: #FFA000;
 }
 
+.clear-all-tasks {
+    padding: 10px 20px;
+    border: none;
+    background-color: #FF4D4D;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s;
+}
+
+.clear-all-tasks:hover {
+    background-color: #FF0000;
+}
+
+body.dark-mode .clear-all-tasks {
+    background-color: #FF4D4D;
+    color: white;
+}
+
+body.dark-mode .clear-all-tasks:hover {
+    background-color: #FF0000;
+}

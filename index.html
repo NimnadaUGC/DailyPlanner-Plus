@@ -57,10 +57,21 @@
             </div>
             <ul id="task-list"></ul>
             <div class="google-buttons">
-                <button onclick="downloadTxt()">Download TXT</button>
-                <button onclick="downloadHtml()">Download HTML</button>
-                <button onclick="uploadToGoogleDrive('txt')">Upload TXT to Google Drive</button>
-                <button onclick="uploadToGoogleDrive('html')">Upload HTML to Google Drive</button>
+                <div class="dropdown">
+                    <button class="dropbtn">Download</button>
+                    <div class="dropdown-content">
+                        <a href="#" onclick="downloadTxt()">TXT</a>
+                        <a href="#" onclick="downloadHtml()">HTML</a>
+                    </div>
+                </div>
+                <div class="dropdown">
+                    <button class="dropbtn">Upload to Google Drive</button>
+                    <div class="dropdown-content">
+                        <a href="#" onclick="uploadToGoogleDrive('txt')">TXT</a>
+                        <a href="#" onclick="uploadToGoogleDrive('html')">HTML</a>
+                    </div>
+                </div>
+                <button id="clear-all-tasks">Clear All Tasks</button>
             </div>
         </div>
     </main>

@@ -4,9 +4,9 @@ document.addEventListener('DOMContentLoaded', function () {
     const storedTasks = loadTasksFromLocalStorage();
     taskCounter = storedTasks.length + 1;
 
-    storedTasks.forEach(task => addTask(task.taskTitle, task.startTime, task.hours, task.minutes, task.date, task.note, task.subtasks));
+    storedTasks.forEach((task, index) => addTask(task.taskTitle, task.startTime, task.hours, task.minutes, task.date, task.note, task.subtasks, index + 1));
 
-    function addTask(taskTitle = '', startTime = '', hours = '01', minutes = '00', date = '', note = '', subtasks = []) {
+    function addTask(taskTitle = '', startTime = '', hours = '01', minutes = '00', date = '', note = '', subtasks = [], taskNumber = null) {
         if (taskTitle.trim() === '' && taskInput.value.trim() === '') {
             showAlert('Please enter a task.');
             return;
@@ -17,10 +17,11 @@ document.addEventListener('DOMContentLoaded', function () {
         const tomorrow = new Date();
         tomorrow.setDate(tomorrow.getDate() + 1);
         const defaultDate = date || tomorrow.toISOString().split('T')[0];
+        taskNumber = taskNumber || taskCounter;
 
         li.innerHTML = `
             <div class="task-main">
-                <span class="task-title">${taskCounter}. ${taskText}</span>
+                <span class="task-title">${taskNumber}. ${taskText}</span>
                 <br>
                 <div class="task-time">
                     <label>Start Time: <input type="time" class="start-time" value="${startTime}"></label>
@@ -51,10 +52,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 <button onclick="addSubtask(this)">Add Subtask</button>
             </div>
         `;
-        li.dataset.taskNumber = taskCounter; // Store the task number for subtasks
+        li.dataset.taskNumber = taskNumber;
         taskList.appendChild(li);
         taskInput.value = '';
-        taskCounter++;
+        taskCounter = taskNumber + 1;
         saveTasksToLocalStorage();
     }
 
@@ -174,6 +175,16 @@ document.addEventListener('DOMContentLoaded', function () {
         return JSON.parse(localStorage.getItem('tasks')) || [];
     }
 
+    function clearAllTasks() {
+        if (confirm('Are you sure you want to clear all tasks? This action cannot be undone.')) {
+            localStorage.removeItem('tasks');
+            taskList.innerHTML = '';
+            taskCounter = 1;
+        }
+    }
+
+    document.getElementById('clear-all-tasks').addEventListener('click', clearAllTasks);
+
     window.addTask = addTask;
     window.editTask = editTask;
     window.deleteTask = deleteTask;
@@ -184,104 +195,104 @@ document.addEventListener('DOMContentLoaded', function () {
 
     window.downloadTxt = downloadTxt;
     window.downloadHtml = downloadHtml;
-    
+
+    function downloadTxt() {
+        const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+        if (tasks.length === 0) {
+            showAlert('No tasks to download.');
+            return;
+        }
+
+        let txtContent = "Daily Planner Tasks:\n\n";
+        tasks.forEach((task, index) => {
+            txtContent += `${index + 1}. ${task.taskTitle}\n`;
+            txtContent += `   Date: ${task.date}\n`;
+            txtContent += `   Start Time: ${task.startTime}\n`;
+            txtContent += `   Duration: ${task.hours}h ${task.minutes}m\n`;
+            txtContent += `   Note: ${task.note}\n`;
+            if (task.subtasks.length > 0) {
+                txtContent += "   Subtasks:\n";
+                task.subtasks.forEach((subtask, subIndex) => {
+                    txtContent += `      ${index + 1}.${subIndex + 1} ${subtask}\n`;
+                });
+            }
+            txtContent += "\n";
+        });
+
+        const blob = new Blob([txtContent], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'daily_planner.txt';
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    function downloadHtml() {
+        const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+        if (tasks.length === 0) {
+            showAlert('No tasks to download.');
+            return;
+        }
+
+        let htmlContent = `
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Daily Planner</title>
+            <style>
+                body { font-family: Arial, sans-serif; padding: 20px; }
+                h1 { text-align: center; }
+                .task { margin-bottom: 20px; }
+                .task-title { font-weight: bold; }
+                .subtask { margin-left: 20px; }
+                .completed { text-decoration: line-through; }
+            </style>
+        </head>
+        <body>
+            <h1>Daily Planner</h1>
+        `;
+
+        tasks.forEach((task, index) => {
+            htmlContent += `
+            <div class="task">
+                <p class="task-title">${index + 1}. ${task.taskTitle}</p>
+                <p>Date: ${task.date}</p>
+                <p>Start Time: ${task.startTime}</p>
+                <p>Duration: ${task.hours}h ${task.minutes}m</p>
+                <p>Note: ${task.note}</p>
+                ${task.subtasks.length > 0 ? '<p>Subtasks:</p>' : ''}
+                <ul>
+            `;
+            task.subtasks.forEach((subtask, subIndex) => {
+                htmlContent += `<li class="subtask"><input type="checkbox"> ${subtask}</li>`;
+            });
+            htmlContent += `
+                </ul>
+            </div>
+            `;
+        });
+
+        htmlContent += `
+        </body>
+        </html>
+        `;
+
+        const blob = new Blob([htmlContent], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'daily_planner.html';
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
     // Clear local storage after downloading or uploading tasks
-    window.clearTasksAfterAction = function() {
+    window.clearTasksAfterAction = function () {
         localStorage.removeItem('tasks');
         taskList.innerHTML = '';
         taskCounter = 1;
     };
 });
-
-function downloadTxt() {
-    const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
-    if (tasks.length === 0) {
-        showAlert('No tasks to download.');
-        return;
-    }
-
-    let txtContent = "Daily Planner Tasks:\n\n";
-    tasks.forEach((task, index) => {
-        txtContent += `${index + 1}. ${task.taskTitle}\n`;
-        txtContent += `   Date: ${task.date}\n`;
-        txtContent += `   Start Time: ${task.startTime}\n`;
-        txtContent += `   Duration: ${task.hours}h ${task.minutes}m\n`;
-        txtContent += `   Note: ${task.note}\n`;
-        if (task.subtasks.length > 0) {
-            txtContent += "   Subtasks:\n";
-            task.subtasks.forEach((subtask, subIndex) => {
-                txtContent += `      ${index + 1}.${subIndex + 1} ${subtask}\n`;
-            });
-        }
-        txtContent += "\n";
-    });
-
-    const blob = new Blob([txtContent], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'daily_planner.txt';
-    a.click();
-    URL.revokeObjectURL(url);
-}
-
-function downloadHtml() {
-    const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
-    if (tasks.length === 0) {
-        showAlert('No tasks to download.');
-        return;
-    }
-
-    let htmlContent = `
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Daily Planner</title>
-        <style>
-            body { font-family: Arial, sans-serif; padding: 20px; }
-            h1 { text-align: center; }
-            .task { margin-bottom: 20px; }
-            .task-title { font-weight: bold; }
-            .subtask { margin-left: 20px; }
-            .completed { text-decoration: line-through; }
-        </style>
-    </head>
-    <body>
-        <h1>Daily Planner</h1>
-    `;
-
-    tasks.forEach((task, index) => {
-        htmlContent += `
-        <div class="task">
-            <p class="task-title">${index + 1}. ${task.taskTitle}</p>
-            <p>Date: ${task.date}</p>
-            <p>Start Time: ${task.startTime}</p>
-            <p>Duration: ${task.hours}h ${task.minutes}m</p>
-            <p>Note: ${task.note}</p>
-            ${task.subtasks.length > 0 ? '<p>Subtasks:</p>' : ''}
-            <ul>
-        `;
-        task.subtasks.forEach((subtask, subIndex) => {
-            htmlContent += `<li class="subtask"><input type="checkbox"> ${subtask}</li>`;
-        });
-        htmlContent += `
-            </ul>
-        </div>
-        `;
-    });
-
-    htmlContent += `
-    </body>
-    </html>
-    `;
-
-    const blob = new Blob([htmlContent], { type: 'text/html' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'daily_planner.html';
-    a.click();
-    URL.revokeObjectURL(url);
-}
