@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const taskInput = document.getElementById('task-input');
     const taskList = document.getElementById('task-list');
     const storedTasks = loadTasksFromLocalStorage();
-    taskCounter = storedTasks.length + 1;
+    let taskCounter = storedTasks.length + 1;
 
     storedTasks.forEach((task, index) => addTask(task.taskTitle, task.startTime, task.hours, task.minutes, task.date, task.note, task.subtasks, index + 1));
 
@@ -196,6 +196,14 @@ document.addEventListener('DOMContentLoaded', function () {
     window.downloadTxt = downloadTxt;
     window.downloadHtml = downloadHtml;
 
+    function getFormattedDate() {
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+        const day = String(today.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+
     function downloadTxt() {
         const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
         if (tasks.length === 0) {
@@ -219,11 +227,12 @@ document.addEventListener('DOMContentLoaded', function () {
             txtContent += "\n";
         });
 
+        const formattedDate = getFormattedDate();
         const blob = new Blob([txtContent], { type: 'text/plain' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = 'daily_planner.txt';
+        a.download = `daily_planner_${formattedDate}.txt`;
         a.click();
         URL.revokeObjectURL(url);
     }
@@ -280,14 +289,119 @@ document.addEventListener('DOMContentLoaded', function () {
         </html>
         `;
 
+        const formattedDate = getFormattedDate();
         const blob = new Blob([htmlContent], { type: 'text/html' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = 'daily_planner.html';
+        a.download = `daily_planner_${formattedDate}.html`;
         a.click();
         URL.revokeObjectURL(url);
     }
+
+    async function uploadToGoogleDrive(type) {
+        const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+        if (tasks.length === 0) {
+            showAlert('No tasks to upload.');
+            return;
+        }
+
+        const formattedDate = getFormattedDate();
+        let content = '';
+        let mimeType = '';
+
+        if (type === 'txt') {
+            let txtContent = "Daily Planner Tasks:\n\n";
+            tasks.forEach((task, index) => {
+                txtContent += `${index + 1}. ${task.taskTitle}\n`;
+                txtContent += `   Date: ${task.date}\n`;
+                txtContent += `   Start Time: ${task.startTime}\n`;
+                txtContent += `   Duration: ${task.hours}h ${task.minutes}m\n`;
+                txtContent += `   Note: ${task.note}\n`;
+                if (task.subtasks.length > 0) {
+                    txtContent += "   Subtasks:\n";
+                    task.subtasks.forEach((subtask, subIndex) => {
+                        txtContent += `      ${index + 1}.${subIndex + 1} ${subtask}\n`;
+                    });
+                }
+                txtContent += "\n";
+            });
+            content = txtContent;
+            mimeType = 'text/plain';
+        } else if (type === 'html') {
+            let htmlContent = `
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Daily Planner</title>
+                <style>
+                    body { font-family: Arial, sans-serif; padding: 20px; }
+                    h1 { text-align: center; }
+                    .task { margin-bottom: 20px; }
+                    .task-title { font-weight: bold; }
+                    .subtask { margin-left: 20px; }
+                    .completed { text-decoration: line-through; }
+                </style>
+            </head>
+            <body>
+                <h1>Daily Planner</h1>
+            `;
+
+            tasks.forEach((task, index) => {
+                htmlContent += `
+                <div class="task">
+                    <p class="task-title">${index + 1}. ${task.taskTitle}</p>
+                    <p>Date: ${task.date}</p>
+                    <p>Start Time: ${task.startTime}</p>
+                    <p>Duration: ${task.hours}h ${task.minutes}m</p>
+                    <p>Note: ${task.note}</p>
+                    ${task.subtasks.length > 0 ? '<p>Subtasks:</p>' : ''}
+                    <ul>
+                `;
+                task.subtasks.forEach((subtask, subIndex) => {
+                    htmlContent += `<li class="subtask"><input type="checkbox"> ${subtask}</li>`;
+                });
+                htmlContent += `
+                    </ul>
+                </div>
+                `;
+            });
+
+            htmlContent += `
+            </body>
+            </html>
+            `;
+
+            content = htmlContent;
+            mimeType = 'text/html';
+        }
+
+        const fileName = `daily_planner_${formattedDate}.${type}`;
+
+        try {
+            const fileMetadata = {
+                name: fileName,
+                mimeType: mimeType
+            };
+            const media = {
+                mimeType: mimeType,
+                body: new Blob([content], { type: mimeType })
+            };
+            const response = await gapi.client.drive.files.create({
+                resource: fileMetadata,
+                media: media,
+                fields: 'id'
+            });
+            console.log('File uploaded to Google Drive with ID:', response.result.id);
+        } catch (error) {
+            console.error('Error uploading file to Google Drive:', error);
+            showAlert('Failed to upload to Google Drive.');
+        }
+    }
+
+    window.uploadToGoogleDrive = uploadToGoogleDrive;
 
     // Clear local storage after downloading or uploading tasks
     window.clearTasksAfterAction = function () {

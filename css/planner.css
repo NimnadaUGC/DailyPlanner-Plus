@@ -178,20 +178,23 @@ body.dark-mode #planner-heading {
 
 .planner-input {
     display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
     position: sticky;
     top: 0;
     background: inherit;
     z-index: 1;
     padding: 10px 0;
+    gap: 10px;
 }
 
 .planner-input input[type="text"] {
     font-family: inherit;
     padding: 10px;
-    margin-right: 10px;
     border: 1px solid #ccc;
     border-radius: 4px;
-    width: 70%;
+    width: calc(70% - 20px);
     font-size: 1em;
     background: white;
     color: black;
@@ -457,11 +460,12 @@ body.dark-mode .custom-alert button:hover {
 
 @media (max-width: 600px) {
     .planner-input input[type="text"] {
-        width: 60%;
+        width: 100%;
     }
 
     .planner-input button {
         font-size: 0.9em;
+        width: 100%;
     }
 
     #planner {
@@ -476,7 +480,8 @@ body.dark-mode .custom-alert button:hover {
 .google-buttons {
     margin-top: 20px;
     display: flex;
-    justify-content: space-between;
+    justify-content: space-around;
+    width: 100%;
 }
 
 .dropdown {
@@ -492,6 +497,7 @@ body.dark-mode .custom-alert button:hover {
     border: none;
     cursor: pointer;
     border-radius: 4px;
+    transition: background-color 0.3s;
 }
 
 .dropdown-content {
@@ -554,6 +560,7 @@ body.dark-mode .dropbtn:hover {
     cursor: pointer;
     font-size: 1em;
     transition: background-color 0.3s;
+    margin-left: 10px;
 }
 
 .clear-all-tasks:hover {
