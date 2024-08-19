@@ -87,7 +87,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             ${generateMinutesOptions(minutes)}
                         </select>
                     </label>
-                    <input type="date" value="${defaultDate}">
+                    <label>Date: <input type="date" value="${defaultDate}"></label>
                 </div>
                 <div class="task-actions">
                     <button class="edit" onclick="editTask(this)"><i class="fas fa-pencil-alt" style="color: orange;"></i> Edit</button>
@@ -102,7 +102,7 @@ document.addEventListener('DOMContentLoaded', function () {
             </ul>
             <div class="subtask-input">
                 <input type="text" placeholder="Add subtask">
-                <button onclick="addSubtask(this)">Add Subtask</button>
+                <button onclick="addSubtask(this)">Add</button>
             </div>
         `;
         li.dataset.taskNumber = taskNumber;
@@ -203,7 +203,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function saveTasksToLocalStorage() {
         const tasks = [];
-        taskList.querySelectorAll('li').forEach(li => {
+        taskList.querySelectorAll('li').foreach(li => {
             const taskTitle = li.querySelector('.task-title') ? li.querySelector('.task-title').textContent : '';
             const startTime = li.querySelector('.start-time') ? li.querySelector('.start-time').value : '';
             const hours = li.querySelector('.expected-hours') ? li.querySelector('.expected-hours').value : '';

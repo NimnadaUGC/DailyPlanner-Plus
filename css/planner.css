@@ -326,7 +326,8 @@ body.dark-mode .task-actions button:hover {
 .google-buttons {
     margin-top: 20px;
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
+    gap: 10px;
     width: 100%;
 }
 
@@ -487,6 +488,7 @@ body.dark-mode .subtask-list li {
 .subtask-input {
     display: flex;
     align-items: center;
+    width: 100%;
 }
 
 .subtask-input input[type="text"] {
@@ -494,8 +496,8 @@ body.dark-mode .subtask-list li {
     padding: 5px;
     border: 1px solid #ccc;
     border-radius: 4px;
-    width: 80%;
-    font-size: 1em;
+    width: 90%;
+    font-size: 0.9em;
     background: white;
     color: black;
     transition: background 0.3s, color 0.3s, border-color 0.3s;
@@ -537,7 +539,7 @@ body.dark-mode .subtask-input button:hover {
 .note textarea {
     font-family: inherit;
     width: 100%;
-    height: 150px;
+    height: 250px; /* Increased height for larger text area */
     border: 1px solid #ccc;
     border-radius: 4px;
     padding: 10px;
