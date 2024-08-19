@@ -42,7 +42,6 @@ async function uploadToGoogleDrive(format) {
                 .task { margin-bottom: 20px; }
                 .task-title { font-weight: bold; }
                 .subtask { margin-left: 20px; }
-                .completed { text-decoration: line-through; }
             </style>
         </head>
         <body>
@@ -60,7 +59,7 @@ async function uploadToGoogleDrive(format) {
                 <ul>
             `;
             task.subtasks.forEach((subtask, subIndex) => {
-                htmlContent += `<li class="subtask"><input type="checkbox"> ${subtask}</li>`;
+                htmlContent += `<li class="subtask">${index + 1}.${subIndex + 1} ${subtask}</li>`;
             });
             htmlContent += `
                 </ul>
