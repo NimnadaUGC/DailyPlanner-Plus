@@ -59,7 +59,7 @@ async function uploadToGoogleDrive(format) {
                 ${task.subtasks.length > 0 ? '<p>Subtasks:</p>' : ''}
                 <ul>
             `;
-            task.subtasks.forEach((subtask) => {
+            task.subtasks.forEach((subtask, subIndex) => {
                 htmlContent += `<li class="subtask"><input type="checkbox"> ${subtask}</li>`;
             });
             htmlContent += `
@@ -94,5 +94,6 @@ async function uploadToGoogleDrive(format) {
         console.log('File uploaded to Google Drive with ID:', file.id);
     } catch (error) {
         console.error('Error uploading file to Google Drive:', error);
+        showAlert('Failed to upload to Google Drive. Please try again.');
     }
 }

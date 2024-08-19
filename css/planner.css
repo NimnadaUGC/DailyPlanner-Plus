@@ -366,6 +366,12 @@ body.dark-mode .icon-button:hover {
     background-color: #FFA000;
 }
 
+body .icon-button[disabled] {
+    background-color: grey;
+    color: lightgrey;
+    cursor: not-allowed;
+}
+
 .modal {
     display: none;
     position: fixed;
@@ -479,7 +485,7 @@ body.dark-mode .subtask-list li {
     padding: 5px;
     border: 1px solid #ccc;
     border-radius: 4px;
-    width: 70%;
+    width: 80%;
     font-size: 1em;
     background: white;
     color: black;
@@ -521,7 +527,7 @@ body.dark-mode .subtask-input button:hover {
 .note textarea {
     font-family: inherit;
     width: 100%;
-    height: 100px;
+    height: 150px;
     border: 1px solid #ccc;
     border-radius: 4px;
     padding: 10px;
@@ -539,7 +545,8 @@ body.dark-mode .note textarea {
 
 /* Styling for Time and Date Inputs */
 .task-time input[type="time"], 
-.task-time input[type="date"] {
+.task-time input[type="date"],
+.task-time select {
     font-family: inherit;
     padding: 5px;
     border: 1px solid #ccc;
@@ -550,7 +557,8 @@ body.dark-mode .note textarea {
 }
 
 body.dark-mode .task-time input[type="time"], 
-body.dark-mode .task-time input[type="date"] {
+body.dark-mode .task-time input[type="date"],
+body.dark-mode .task-time select {
     background: #333;
     color: white;
     border-color: #666;

@@ -9,10 +9,12 @@ document.addEventListener('DOMContentLoaded', function () {
     // Modal related variables
     const downloadModal = document.getElementById('download-modal');
     const uploadModal = document.getElementById('upload-modal');
+    const editTaskModal = document.getElementById('edit-task-modal');
     const downloadButton = document.getElementById('download-button');
     const uploadButton = document.getElementById('upload-button');
     const authorizeButton = document.getElementById('authorize-button');
     const closeButtons = document.querySelectorAll('.close');
+    let currentEditTask = null;
 
     downloadButton.onclick = function () {
         downloadModal.style.display = 'block';
@@ -30,6 +32,7 @@ document.addEventListener('DOMContentLoaded', function () {
         button.onclick = function () {
             downloadModal.style.display = 'none';
             uploadModal.style.display = 'none';
+            editTaskModal.style.display = 'none';
         };
     });
 
@@ -39,6 +42,21 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         if (event.target === uploadModal) {
             uploadModal.style.display = 'none';
+        }
+        if (event.target === editTaskModal) {
+            editTaskModal.style.display = 'none';
+        }
+    };
+
+    document.getElementById('save-task-button').onclick = function () {
+        if (currentEditTask) {
+            const newValue = document.getElementById('edit-task-input').value.trim();
+            if (newValue) {
+                const taskNumber = currentEditTask.dataset.taskNumber;
+                currentEditTask.querySelector('.task-title').textContent = `${taskNumber}. ${newValue}`;
+                saveTasksToLocalStorage();
+            }
+            editTaskModal.style.display = 'none';
         }
     };
 
@@ -69,8 +87,8 @@ document.addEventListener('DOMContentLoaded', function () {
                             ${generateMinutesOptions(minutes)}
                         </select>
                     </label>
+                    <input type="date" value="${defaultDate}">
                 </div>
-                <input type="date" value="${defaultDate}">
                 <div class="task-actions">
                     <button class="edit" onclick="editTask(this)"><i class="fas fa-pencil-alt" style="color: orange;"></i> Edit</button>
                     <button class="delete" onclick="deleteTask(this)"><i class="fas fa-trash-alt" style="color: red;"></i> Delete</button>
@@ -80,7 +98,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 <textarea placeholder="Add a note">${note}</textarea>
             </div>
             <ul class="subtask-list">
-                ${subtasks.map(subtask => `<li class="subtask"><span class="subtask-title">${subtask}</span> <button class="delete" onclick="deleteSubtask(this)"><i class="fas fa-times" style="color: red;"></i></button><hr></li>`).join('')}
+                ${subtasks.map(subtask => `<li class="subtask"><span class="subtask-title">${subtask}</span> <button class="delete" onclick="deleteSubtask(this)"><i class="fas fa-times" style="color: red;"></i> Delete</button><hr></li>`).join('')}
             </ul>
             <div class="subtask-input">
                 <input type="text" placeholder="Add subtask">
@@ -116,12 +134,9 @@ document.addEventListener('DOMContentLoaded', function () {
         const li = button.closest('li');
         const taskTitle = li.querySelector('.task-title');
         if (taskTitle) {
-            const newValue = prompt('Edit task:', taskTitle.textContent.split('. ')[1]);
-            if (newValue) {
-                const taskNumber = li.dataset.taskNumber;
-                taskTitle.textContent = `${taskNumber}. ${newValue}`;
-                saveTasksToLocalStorage();
-            }
+            currentEditTask = li;
+            document.getElementById('edit-task-input').value = taskTitle.textContent.split('. ')[1];
+            editTaskModal.style.display = 'block';
         }
     }
 
@@ -150,7 +165,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const taskNumber = button.closest('li').dataset.taskNumber;
             const subtaskNumber = ul.children.length + 1;
             subtaskLi.className = 'subtask';
-            subtaskLi.innerHTML = `<span class="subtask-title">${taskNumber}.${subtaskNumber}</span> ${subtaskValue} <button class="delete" onclick="deleteSubtask(this)"><i class="fas fa-times" style="color: red;"></i></button><hr>`;
+            subtaskLi.innerHTML = `<span class="subtask-title">${taskNumber}.${subtaskNumber}</span> ${subtaskValue} <button class="delete" onclick="deleteSubtask(this)"><i class="fas fa-times" style="color: red;"></i> Delete</button><hr>`;
             ul.appendChild(subtaskLi);
             subtaskInput.value = '';
             saveTasksToLocalStorage();
