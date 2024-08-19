@@ -219,23 +219,36 @@ document.addEventListener('DOMContentLoaded', function () {
             showAlert('No tasks to download.');
             return;
         }
-
+    
         let txtContent = "Daily Planner Tasks:\n\n";
         tasks.forEach((task) => {
-            txtContent += `${task.taskTitle}\n`;
-            txtContent += `   Date: ${task.date}\n`;
-            txtContent += `   Start Time: ${task.startTime}\n`;
-            txtContent += `   Duration: ${task.hours}h ${task.minutes}m\n`;
-            txtContent += `   Note: ${task.note}\n`;
+            // Only include fields that have data
+            if (task.taskTitle.trim()) {
+                txtContent += `${task.taskTitle}\n`;
+            }
+            if (task.date.trim()) {
+                txtContent += `   Date: ${task.date}\n`;
+            }
+            if (task.startTime.trim()) {
+                txtContent += `   Start Time: ${task.startTime}\n`;
+            }
+            if (task.hours.trim() || task.minutes.trim()) {
+                txtContent += `   Duration: ${task.hours ? `${task.hours}h` : ''} ${task.minutes ? `${task.minutes}m` : ''}\n`;
+            }
+            if (task.note.trim()) {
+                txtContent += `   Note: ${task.note}\n`;
+            }
             if (task.subtasks.length > 0) {
                 txtContent += "   Subtasks:\n";
                 task.subtasks.forEach((subtask) => {
-                    txtContent += `      - ${subtask}\n`;
+                    if (subtask.trim()) {
+                        txtContent += `      - ${subtask}\n`;
+                    }
                 });
             }
             txtContent += "\n";
         });
-
+    
         const blob = new Blob([txtContent], { type: 'text/plain' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -243,7 +256,7 @@ document.addEventListener('DOMContentLoaded', function () {
         a.download = `daily_planner_${getFormattedDate()}.txt`;
         a.click();
         URL.revokeObjectURL(url);
-    }
+    }    
 
     function downloadHtml() {
         const tasks = getTasksArray();
@@ -340,16 +353,28 @@ document.addEventListener('DOMContentLoaded', function () {
         `;
     
         tasks.forEach((task) => {
-            htmlContent += `
-            <div class="task">
-                <h2><input type="checkbox" class="task-checkbox">${task.taskTitle}</h2>
-                <p class="label">Date: <span class="emphasis">${task.date}</span></p>
-                <p class="label">Start Time: <span class="emphasis">${task.startTime}</span></p>
-                <p class="label">Duration: <span class="highlight">${task.hours}h ${task.minutes}m</span></p>
-                <p class="label">Note: <span class="note">${task.note}</span></p>
-                ${task.subtasks.length > 0 ? '<h3>Subtasks:</h3><ul>' + task.subtasks.map(subtask => `<li><input type="checkbox" class="subtask-checkbox">${subtask}</li>`).join('') + '</ul>' : ''}
-            </div>
-            `;
+            htmlContent += `<div class="task">`;
+            
+            if (task.taskTitle.trim()) {
+                htmlContent += `<h2><input type="checkbox" class="task-checkbox">${task.taskTitle}</h2>`;
+            }
+            if (task.date.trim()) {
+                htmlContent += `<p class="label">Date: <span class="emphasis">${task.date}</span></p>`;
+            }
+            if (task.startTime.trim()) {
+                htmlContent += `<p class="label">Start Time: <span class="emphasis">${task.startTime}</span></p>`;
+            }
+            if (task.hours.trim() || task.minutes.trim()) {
+                htmlContent += `<p class="label">Duration: <span class="highlight">${task.hours ? `${task.hours}h` : ''} ${task.minutes ? `${task.minutes}m` : ''}</span></p>`;
+            }
+            if (task.note.trim()) {
+                htmlContent += `<p class="label">Note: <span class="note">${task.note}</span></p>`;
+            }
+            if (task.subtasks.length > 0) {
+                htmlContent += '<h3>Subtasks:</h3><ul>' + task.subtasks.map(subtask => subtask.trim() ? `<li><input type="checkbox" class="subtask-checkbox">${subtask}</li>` : '').join('') + '</ul>';
+            }
+            
+            htmlContent += `</div>`;
         });
     
         htmlContent += `
@@ -364,7 +389,7 @@ document.addEventListener('DOMContentLoaded', function () {
         a.download = `daily_planner_${getFormattedDate()}.html`;
         a.click();
         URL.revokeObjectURL(url);
-    }
+    }    
     
 
     function getFormattedDate() {
