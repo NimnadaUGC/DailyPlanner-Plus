@@ -172,7 +172,10 @@ async function uploadToGoogleDrive(format) {
     form.append('file', fileContent);
 
     try {
-        const accessToken = gapi.auth.getToken().access_token;
+        // Use the updated method to get the access token
+        const tokenResponse = await google.accounts.oauth2.getAccessToken();
+        const accessToken = tokenResponse.access_token;
+        
         const response = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
             method: 'POST',
             headers: new Headers({ 'Authorization': 'Bearer ' + accessToken }),
