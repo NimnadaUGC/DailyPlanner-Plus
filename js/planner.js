@@ -178,12 +178,15 @@ document.addEventListener('DOMContentLoaded', function () {
     function renumberTasks() {
         const tasks = document.querySelectorAll('#task-list li');
         tasks.forEach((li, index) => {
-            const taskTitle = li.querySelector('.task-title');
             const newTaskNumber = index + 1;
-            taskTitle.textContent = `${newTaskNumber}. ${taskTitle.textContent.split('. ')[1]}`;
+            const taskTitle = li.querySelector('.task-title');
+            if (taskTitle) {
+                // Ensure taskTitle is not null before accessing its textContent
+                taskTitle.textContent = `${newTaskNumber}. ${taskTitle.textContent.split('. ')[1]}`;
+            }
             li.dataset.taskNumber = newTaskNumber;
         });
-    }
+    }    
 
     function toggleComplete(button) {
         const li = button.closest('li');
@@ -454,6 +457,7 @@ document.addEventListener('DOMContentLoaded', function () {
     window.toggleComplete = toggleComplete;
     window.addSubtask = addSubtask;
     window.deleteSubtask = deleteSubtask;
+    window.getTasksArray = getTasksArray;
 
     window.downloadTxt = downloadTxt;
     window.downloadHtml = downloadHtml;
