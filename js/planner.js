@@ -101,7 +101,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 <textarea placeholder="Add a note">${note}</textarea>
             </div>
             <ul class="subtask-list">
-                ${subtasks.map(subtask => `<li class="subtask"><span class="subtask-title">${subtask}</span> <i class="fas fa-trash delete" onclick="deleteSubtask(this)" style="color: red;"></i></li>`).join('')}
+                ${subtasks.map((subtask, index) => `<li class="subtask"><span class="subtask-title">${taskNumber}.${index + 1} ${subtask}</span> <i class="fas fa-trash delete" onclick="deleteSubtask(this)" style="color: red;"></i></li>`).join('')}
             </ul>
             <div class="subtask-input">
                 <input type="text" placeholder="Add subtask">
@@ -178,7 +178,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const taskNumber = button.closest('li').dataset.taskNumber;
             const subtaskNumber = ul.children.length + 1;
             subtaskLi.className = 'subtask';
-            subtaskLi.innerHTML = `<span class="subtask-title">${taskNumber}.${subtaskNumber}</span> ${subtaskValue} <i class="fas fa-trash delete" onclick="deleteSubtask(this)" style="color: red;"></i>`;
+            subtaskLi.innerHTML = `<span class="subtask-title">${taskNumber}.${subtaskNumber} ${subtaskValue}</span> <i class="fas fa-trash delete" onclick="deleteSubtask(this)" style="color: red;"></i>`;
             ul.appendChild(subtaskLi);
             subtaskInput.value = '';
         }
@@ -221,16 +221,16 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         let txtContent = "Daily Planner Tasks:\n\n";
-        tasks.forEach((task, index) => {
-            txtContent += `${index + 1}. ${task.taskTitle}\n`;
+        tasks.forEach((task) => {
+            txtContent += `${task.taskTitle}\n`;
             txtContent += `   Date: ${task.date}\n`;
             txtContent += `   Start Time: ${task.startTime}\n`;
             txtContent += `   Duration: ${task.hours}h ${task.minutes}m\n`;
             txtContent += `   Note: ${task.note}\n`;
             if (task.subtasks.length > 0) {
                 txtContent += "   Subtasks:\n";
-                task.subtasks.forEach((subtask, subIndex) => {
-                    txtContent += `      ${index + 1}.${subIndex + 1} ${subtask}\n`;
+                task.subtasks.forEach((subtask) => {
+                    txtContent += `      - ${subtask}\n`;
                 });
             }
             txtContent += "\n";
@@ -260,27 +260,31 @@ document.addEventListener('DOMContentLoaded', function () {
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>Daily Planner</title>
             <style>
-                body { font-family: Arial, sans-serif; padding: 20px; }
-                h1 { text-align: center; }
-                h2 { margin-top: 20px; }
-                p { margin: 5px 0; }
-                ul { list-style-type: disc; margin-left: 20px; }
-                .task-title { font-weight: bold; }
+                body { font-family: Arial, sans-serif; padding: 20px; background-color: #f4f4f4; color: #333; }
+                h1 { text-align: center; color: #4a90e2; }
+                h2 { margin-top: 20px; color: #333; }
+                p { margin: 5px 0; font-size: 1.1em; }
+                ul { list-style-type: disc; padding-left: 20px; }
+                .task-title { font-weight: bold; font-size: 1.2em; }
                 .subtask-title { font-style: italic; }
+                .note { font-style: italic; color: #555; }
+                .label { font-weight: bold; }
+                .emphasis { color: #d9534f; }
+                .highlight { background-color: #ffeb3b; }
             </style>
         </head>
         <body>
             <h1>Daily Planner</h1>
         `;
 
-        tasks.forEach((task, index) => {
+        tasks.forEach((task) => {
             htmlContent += `
             <div class="task">
-                <h2>${index + 1}. ${task.taskTitle}</h2>
-                <p><strong>Date:</strong> ${task.date}</p>
-                <p><strong>Start Time:</strong> ${task.startTime}</p>
-                <p><strong>Duration:</strong> ${task.hours}h ${task.minutes}m</p>
-                <p><strong>Note:</strong> ${task.note}</p>
+                <h2 class="task-title">${task.taskTitle}</h2>
+                <p class="label">Date: <span class="emphasis">${task.date}</span></p>
+                <p class="label">Start Time: <span class="emphasis">${task.startTime}</span></p>
+                <p class="label">Duration: <span class="highlight">${task.hours}h ${task.minutes}m</span></p>
+                <p class="label">Note: <span class="note">${task.note}</span></p>
                 ${task.subtasks.length > 0 ? '<h3>Subtasks:</h3><ul>' + task.subtasks.map(subtask => `<li class="subtask-title">${subtask}</li>`).join('') + '</ul>' : ''}
             </div>
             `;
