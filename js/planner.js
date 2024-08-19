@@ -138,6 +138,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (taskTitle) {
             currentEditTask = li;
             document.getElementById('edit-task-input').value = taskTitle.textContent.split('. ')[1];
+            document.getElementById('edit-task-input').style.fontFamily = getComputedStyle(document.body).fontFamily;
             editTaskModal.style.display = 'block';
         }
     }
