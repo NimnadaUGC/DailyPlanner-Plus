@@ -54,24 +54,14 @@
             <div class="planner-input">
                 <input type="text" id="task-input" placeholder="Add new task">
                 <button onclick="addTask()">Add Task</button>
-                <button id="clear-all-tasks" class="clear-all-tasks">Clear All Tasks</button>
+                <button id="clear-all-tasks" class="clear-all-tasks">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
             </div>
             <ul id="task-list"></ul>
             <div class="google-buttons">
-                <div class="dropdown">
-                    <button class="dropbtn">Download</button>
-                    <div class="dropdown-content">
-                        <a href="#" onclick="downloadTxt()">TXT</a>
-                        <a href="#" onclick="downloadHtml()">HTML</a>
-                    </div>
-                </div>
-                <div class="dropdown">
-                    <button class="dropbtn">Upload to Google Drive</button>
-                    <div class="dropdown-content">
-                        <a href="#" onclick="uploadToGoogleDrive('txt')">TXT</a>
-                        <a href="#" onclick="uploadToGoogleDrive('html')">HTML</a>
-                    </div>
-                </div>
+                <button id="download-button" class="icon-button"><i class="fas fa-download"></i> Download</button>
+                <button id="upload-button" class="icon-button"><i class="fas fa-cloud-upload-alt"></i> Upload to Google Drive</button>
             </div>
         </div>
     </main>
@@ -84,6 +74,27 @@
             University of Ruhuna
         </small>
     </footer>
+
+    <!-- Pop-up Modal for Download Options -->
+    <div id="download-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Select Download Format</h2>
+            <button onclick="downloadTxt()">Download TXT</button>
+            <button onclick="downloadHtml()">Download HTML</button>
+        </div>
+    </div>
+
+    <!-- Pop-up Modal for Upload Options -->
+    <div id="upload-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Select Upload Format</h2>
+            <button onclick="uploadToGoogleDrive('txt')">Upload TXT</button>
+            <button onclick="uploadToGoogleDrive('html')">Upload HTML</button>
+        </div>
+    </div>
+
     <script src="js/config.js"></script>
     <script src="js/clock.js"></script>
     <script src="js/planner.js"></script>

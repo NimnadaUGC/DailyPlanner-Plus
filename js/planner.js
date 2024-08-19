@@ -6,6 +6,37 @@ document.addEventListener('DOMContentLoaded', function () {
 
     storedTasks.forEach((task, index) => addTask(task.taskTitle, task.startTime, task.hours, task.minutes, task.date, task.note, task.subtasks, index + 1));
 
+    // Modal related variables
+    const downloadModal = document.getElementById('download-modal');
+    const uploadModal = document.getElementById('upload-modal');
+    const downloadButton = document.getElementById('download-button');
+    const uploadButton = document.getElementById('upload-button');
+    const closeButtons = document.querySelectorAll('.close');
+
+    downloadButton.onclick = function () {
+        downloadModal.style.display = 'block';
+    };
+
+    uploadButton.onclick = function () {
+        uploadModal.style.display = 'block';
+    };
+
+    closeButtons.forEach(button => {
+        button.onclick = function () {
+            downloadModal.style.display = 'none';
+            uploadModal.style.display = 'none';
+        };
+    });
+
+    window.onclick = function (event) {
+        if (event.target === downloadModal) {
+            downloadModal.style.display = 'none';
+        }
+        if (event.target === uploadModal) {
+            uploadModal.style.display = 'none';
+        }
+    };
+
     function addTask(taskTitle = '', startTime = '', hours = '01', minutes = '00', date = '', note = '', subtasks = [], taskNumber = null) {
         if (taskTitle.trim() === '' && taskInput.value.trim() === '') {
             showAlert('Please enter a task.');
@@ -38,7 +69,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 <div class="task-actions">
                     <button class="edit" onclick="editTask(this)"><i class="fas fa-pencil-alt" style="color: orange;"></i></button>
                     <button class="delete" onclick="deleteTask(this)"><i class="fas fa-times" style="color: red;"></i></button>
-                    <button class="complete" onclick="toggleComplete(this)"><i class="fas fa-check" style="color: green;"></i></button>
                 </div>
             </div>
             <div class="note">
