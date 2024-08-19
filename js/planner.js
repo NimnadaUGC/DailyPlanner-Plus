@@ -1,13 +1,13 @@
 document.addEventListener('DOMContentLoaded', function () {
     const taskInput = document.getElementById('task-input');
     const taskList = document.getElementById('task-list');
-    let storedTasks = loadTasksFromLocalStorage();
+    const storedTasks = loadTasksFromLocalStorage();
     let taskCounter = storedTasks.length + 1;
 
-    // Clear existing tasks before loading from local storage
+    // Clear the list before loading tasks from local storage
     taskList.innerHTML = '';
 
-    // Load tasks from local storage, filtering out any incomplete or empty tasks
+    // Load tasks from local storage and add to the list
     storedTasks.forEach((task, index) => {
         if (task.taskTitle.trim() !== '') {
             addTask(task.taskTitle, task.startTime, task.hours, task.minutes, task.date, task.note, task.subtasks, index + 1);
@@ -160,8 +160,8 @@ document.addEventListener('DOMContentLoaded', function () {
             const li = button.closest('li');
             if (li) {
                 li.remove();
-                renumberTasks();
                 saveTasksToLocalStorage();
+                renumberTasks();
             }
         });
     }
@@ -174,6 +174,7 @@ document.addEventListener('DOMContentLoaded', function () {
             taskTitle.textContent = `${newTaskNumber}. ${taskTitle.textContent.split('. ')[1]}`;
             li.dataset.taskNumber = newTaskNumber;
         });
+        saveTasksToLocalStorage();
     }
 
     function toggleComplete(button) {
@@ -247,7 +248,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                 }
             );
-            tasks.push({ taskTitle, startTime, hours, minutes, date, note, subtasks });
+            if (taskTitle.trim() !== '') {
+                tasks.push({ taskTitle, startTime, hours, minutes, date, note, subtasks });
+            }
         });
         localStorage.setItem('tasks', JSON.stringify(tasks));
     }
