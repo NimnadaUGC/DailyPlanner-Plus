@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', function () {
     };
 
     clearAllTasksButton.onclick = function () {
-        showAlert('Are you sure you want to clear all tasks? This action cannot be undone.', () => {
+        showAlert('Are you sure you want to clear all tasks?', () => {
             clearAllTasks();
         });
     };
