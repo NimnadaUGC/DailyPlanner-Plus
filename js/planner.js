@@ -4,15 +4,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const storedTasks = loadTasksFromLocalStorage();
     let taskCounter = storedTasks.length + 1;
 
-    // Clear the list before loading tasks from local storage
-    taskList.innerHTML = '';
-
-    // Load tasks from local storage and add to the list
-    storedTasks.forEach((task, index) => {
-        if (task.taskTitle.trim() !== '') {
-            addTask(task.taskTitle, task.startTime, task.hours, task.minutes, task.date, task.note, task.subtasks, index + 1);
-        }
-    });
+    storedTasks.forEach((task, index) => addTask(task.taskTitle, task.startTime, task.hours, task.minutes, task.date, task.note, task.subtasks, index + 1));
 
     const downloadModal = document.getElementById('download-modal');
     const uploadModal = document.getElementById('upload-modal');
@@ -160,8 +152,8 @@ document.addEventListener('DOMContentLoaded', function () {
             const li = button.closest('li');
             if (li) {
                 li.remove();
-                saveTasksToLocalStorage();
                 renumberTasks();
+                saveTasksToLocalStorage();
             }
         });
     }
@@ -174,7 +166,6 @@ document.addEventListener('DOMContentLoaded', function () {
             taskTitle.textContent = `${newTaskNumber}. ${taskTitle.textContent.split('. ')[1]}`;
             li.dataset.taskNumber = newTaskNumber;
         });
-        saveTasksToLocalStorage();
     }
 
     function toggleComplete(button) {
@@ -248,9 +239,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                 }
             );
-            if (taskTitle.trim() !== '') {
-                tasks.push({ taskTitle, startTime, hours, minutes, date, note, subtasks });
-            }
+            tasks.push({ taskTitle, startTime, hours, minutes, date, note, subtasks });
         });
         localStorage.setItem('tasks', JSON.stringify(tasks));
     }
