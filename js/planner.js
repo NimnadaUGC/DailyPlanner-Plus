@@ -1,10 +1,7 @@
 document.addEventListener('DOMContentLoaded', function () {
     const taskInput = document.getElementById('task-input');
     const taskList = document.getElementById('task-list');
-    const storedTasks = loadTasksFromLocalStorage();
-    let taskCounter = storedTasks.length + 1;
-
-    //storedTasks.forEach((task, index) => addTask(task.taskTitle, task.startTime, task.hours, task.minutes, task.date, task.note, task.subtasks, index + 1));
+    let taskCounter = 1;
 
     const downloadModal = document.getElementById('download-modal');
     const uploadModal = document.getElementById('upload-modal');
@@ -60,7 +57,6 @@ document.addEventListener('DOMContentLoaded', function () {
             if (newValue) {
                 const taskNumber = currentEditTask.dataset.taskNumber;
                 currentEditTask.querySelector('.task-title').textContent = `${taskNumber}. ${newValue}`;
-                saveTasksToLocalStorage();
             }
             editTaskModal.style.display = 'none';
         }
@@ -116,7 +112,6 @@ document.addEventListener('DOMContentLoaded', function () {
         taskList.appendChild(li);
         taskInput.value = '';
         renumberTasks();
-        saveTasksToLocalStorage();
     }
 
     function generateHoursOptions(selectedHour) {
@@ -153,7 +148,6 @@ document.addEventListener('DOMContentLoaded', function () {
             if (li) {
                 li.remove();
                 renumberTasks();
-                saveTasksToLocalStorage();
             }
         });
     }
@@ -172,7 +166,6 @@ document.addEventListener('DOMContentLoaded', function () {
         const li = button.closest('li');
         if (li) {
             li.classList.toggle('completed');
-            saveTasksToLocalStorage();
         }
     }
 
@@ -188,7 +181,6 @@ document.addEventListener('DOMContentLoaded', function () {
             subtaskLi.innerHTML = `<span class="subtask-title">${taskNumber}.${subtaskNumber}</span> ${subtaskValue} <i class="fas fa-trash delete" onclick="deleteSubtask(this)" style="color: red;"></i>`;
             ul.appendChild(subtaskLi);
             subtaskInput.value = '';
-            saveTasksToLocalStorage();
         }
     }
 
@@ -196,7 +188,6 @@ document.addEventListener('DOMContentLoaded', function () {
         const subtaskLi = button.closest('li');
         if (subtaskLi) {
             subtaskLi.remove();
-            saveTasksToLocalStorage();
         }
     }
 
@@ -222,58 +213,8 @@ document.addEventListener('DOMContentLoaded', function () {
         };
     }
 
-    function saveTasksToLocalStorage() {
-        const tasks = [];
-        taskList.querySelectorAll('li').forEach(li => {
-            const taskTitle = li.querySelector('.task-title') ? li.querySelector('.task-title').textContent : '';
-            const startTime = li.querySelector('.start-time') ? li.querySelector('.start-time').value : '';
-            const hours = li.querySelector('.expected-hours') ? li.querySelector('.expected-hours').value : '';
-            const minutes = li.querySelector('.expected-minutes') ? li.querySelector('.expected-minutes').value : '';
-            const date = li.querySelector('input[type="date"]') ? li.querySelector('input[type="date"]').value : '';
-            const note = li.querySelector('.note textarea') ? li.querySelector('.note textarea').value : '';
-            const subtasks = [];
-            li.querySelectorAll('.subtask').forEach(
-                subtask => {
-                    if (subtask.querySelector('.subtask-title')) {
-                        subtasks.push(subtask.querySelector('.subtask-title').textContent);
-                    }
-                }
-            );
-            tasks.push({ taskTitle, startTime, hours, minutes, date, note, subtasks });
-        });
-        localStorage.setItem('tasks', JSON.stringify(tasks));
-    }
-
-    function loadTasksFromLocalStorage() {
-        return JSON.parse(localStorage.getItem('tasks')) || [];
-    }
-
-    function clearAllTasks() {
-        localStorage.removeItem('tasks');
-        taskList.innerHTML = '';
-        taskCounter = 1;
-    }
-
-    window.addTask = addTask;
-    window.editTask = editTask;
-    window.deleteTask = deleteTask;
-    window.toggleComplete = toggleComplete;
-    window.addSubtask = addSubtask;
-    window.deleteSubtask = deleteSubtask;
-
-    window.downloadTxt = downloadTxt;
-    window.downloadHtml = downloadHtml;
-
-    function getFormattedDate() {
-        const today = new Date();
-        const year = today.getFullYear();
-        const month = String(today.getMonth() + 1).padStart(2, '0'); // Months are zero-based
-        const day = String(today.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
-    }
-
     function downloadTxt() {
-        const tasks = loadTasksFromLocalStorage();
+        const tasks = getTasksArray();
         if (tasks.length === 0) {
             showAlert('No tasks to download.');
             return;
@@ -305,7 +246,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function downloadHtml() {
-        const tasks = loadTasksFromLocalStorage();
+        const tasks = getTasksArray();
         if (tasks.length === 0) {
             showAlert('No tasks to download.');
             return;
@@ -321,47 +262,31 @@ document.addEventListener('DOMContentLoaded', function () {
             <style>
                 body { font-family: Arial, sans-serif; padding: 20px; }
                 h1 { text-align: center; }
-                table { width: 100%; border-collapse: collapse; }
-                th, td { padding: 8px 12px; border: 1px solid #ddd; text-align: left; }
-                th { background-color: #f4f4f4; }
-                .subtask { margin-left: 20px; }
+                h2 { margin-top: 20px; }
+                p { margin: 5px 0; }
+                ul { list-style-type: disc; margin-left: 20px; }
+                .task-title { font-weight: bold; }
+                .subtask-title { font-style: italic; }
             </style>
-            <script>
-                function toggleTaskCompletion(taskId) {
-                    var taskRow = document.getElementById(taskId);
-                    taskRow.classList.toggle('completed');
-                }
-            </script>
         </head>
         <body>
             <h1>Daily Planner</h1>
-            <table>
-                <tr>
-                    <th>Task</th>
-                    <th>Date</th>
-                    <th>Start Time</th>
-                    <th>Duration</th>
-                    <th>Notes</th>
-                </tr>
         `;
 
         tasks.forEach((task, index) => {
             htmlContent += `
-            <tr id="task-${index + 1}">
-                <td>
-                    ${task.taskTitle}
-                    ${task.subtasks.length > 0 ? '<ul>' + task.subtasks.map(subtask => `<li class="subtask">${subtask}</li>`).join('') + '</ul>' : ''}
-                </td>
-                <td>${task.date}</td>
-                <td>${task.startTime}</td>
-                <td>${task.hours}h ${task.minutes}m</td>
-                <td>${task.note}</td>
-            </tr>
+            <div class="task">
+                <h2>${index + 1}. ${task.taskTitle}</h2>
+                <p><strong>Date:</strong> ${task.date}</p>
+                <p><strong>Start Time:</strong> ${task.startTime}</p>
+                <p><strong>Duration:</strong> ${task.hours}h ${task.minutes}m</p>
+                <p><strong>Note:</strong> ${task.note}</p>
+                ${task.subtasks.length > 0 ? '<h3>Subtasks:</h3><ul>' + task.subtasks.map(subtask => `<li class="subtask-title">${subtask}</li>`).join('') + '</ul>' : ''}
+            </div>
             `;
         });
 
         htmlContent += `
-            </table>
         </body>
         </html>
         `;
@@ -374,6 +299,51 @@ document.addEventListener('DOMContentLoaded', function () {
         a.click();
         URL.revokeObjectURL(url);
     }
+
+    function getFormattedDate() {
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+        const day = String(today.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+
+    function getTasksArray() {
+        const tasks = [];
+        taskList.querySelectorAll('li').forEach(li => {
+            const taskTitle = li.querySelector('.task-title') ? li.querySelector('.task-title').textContent : '';
+            const startTime = li.querySelector('.start-time') ? li.querySelector('.start-time').value : '';
+            const hours = li.querySelector('.expected-hours') ? li.querySelector('.expected-hours').value : '';
+            const minutes = li.querySelector('.expected-minutes') ? li.querySelector('.expected-minutes').value : '';
+            const date = li.querySelector('input[type="date"]') ? li.querySelector('input[type="date"]').value : '';
+            const note = li.querySelector('.note textarea') ? li.querySelector('.note textarea').value : '';
+            const subtasks = [];
+            li.querySelectorAll('.subtask').forEach(
+                subtask => {
+                    if (subtask.querySelector('.subtask-title')) {
+                        subtasks.push(subtask.querySelector('.subtask-title').textContent);
+                    }
+                }
+            );
+            tasks.push({ taskTitle, startTime, hours, minutes, date, note, subtasks });
+        });
+        return tasks;
+    }
+
+    function clearAllTasks() {
+        taskList.innerHTML = '';
+        taskCounter = 1;
+    }
+
+    window.addTask = addTask;
+    window.editTask = editTask;
+    window.deleteTask = deleteTask;
+    window.toggleComplete = toggleComplete;
+    window.addSubtask = addSubtask;
+    window.deleteSubtask = deleteSubtask;
+
+    window.downloadTxt = downloadTxt;
+    window.downloadHtml = downloadHtml;
 
     async function handleAuthClick() {
         try {
