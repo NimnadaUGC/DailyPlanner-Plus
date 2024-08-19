@@ -203,7 +203,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function saveTasksToLocalStorage() {
         const tasks = [];
-        taskList.querySelectorAll('li').foreach(li => {
+        taskList.querySelectorAll('li').forEach(li => {
             const taskTitle = li.querySelector('.task-title') ? li.querySelector('.task-title').textContent : '';
             const startTime = li.querySelector('.start-time') ? li.querySelector('.start-time').value : '';
             const hours = li.querySelector('.expected-hours') ? li.querySelector('.expected-hours').value : '';
