@@ -1,7 +1,6 @@
 document.addEventListener('DOMContentLoaded', function () {
     const taskInput = document.getElementById('task-input');
     const taskList = document.getElementById('task-list');
-    let taskCounter = 1;
 
     const downloadModal = document.getElementById('download-modal');
     const uploadModal = document.getElementById('upload-modal');
@@ -418,8 +417,7 @@ document.addEventListener('DOMContentLoaded', function () {
         a.download = `daily_planner_${getFormattedDate()}.html`;
         a.click();
         URL.revokeObjectURL(url);
-    }    
-    
+    }
 
     function getFormattedDate() {
         const today = new Date();
@@ -453,7 +451,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function clearAllTasks() {
         taskList.innerHTML = '';
-        taskCounter = 1;
     }
 
     window.addTask = addTask;

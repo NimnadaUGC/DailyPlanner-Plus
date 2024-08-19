@@ -1,5 +1,5 @@
 async function uploadToGoogleDrive(format) {
-    const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+    const tasks = getTasksArray();
     if (tasks.length === 0) {
         showAlert('No tasks to upload.');
         return;
@@ -10,17 +10,30 @@ async function uploadToGoogleDrive(format) {
     if (format === 'txt') {
         fileName = 'daily_planner.txt';
         mimeType = 'text/plain';
+        // Generate TXT content
         let txtContent = "Daily Planner Tasks:\n\n";
-        tasks.forEach((task, index) => {
-            txtContent += `${index + 1}. ${task.taskTitle}\n`;
-            txtContent += `   Date: ${task.date}\n`;
-            txtContent += `   Start Time: ${task.startTime}\n`;
-            txtContent += `   Duration: ${task.hours}h ${task.minutes}m\n`;
-            txtContent += `   Note: ${task.note}\n`;
+        tasks.forEach((task) => {
+            if (task.taskTitle.trim()) {
+                txtContent += `${task.taskTitle}\n`;
+            }
+            if (task.date.trim()) {
+                txtContent += `   Date: ${task.date}\n`;
+            }
+            if (task.startTime.trim()) {
+                txtContent += `   Start Time: ${task.startTime}\n`;
+            }
+            if (task.hours.trim() || task.minutes.trim()) {
+                txtContent += `   Duration: ${task.hours ? `${task.hours}h` : ''} ${task.minutes ? `${task.minutes}m` : ''}\n`;
+            }
+            if (task.note.trim()) {
+                txtContent += `   Note: ${task.note}\n`;
+            }
             if (task.subtasks.length > 0) {
                 txtContent += "   Subtasks:\n";
-                task.subtasks.forEach((subtask, subIndex) => {
-                    txtContent += `      ${index + 1}.${subIndex + 1} ${subtask}\n`;
+                task.subtasks.forEach((subtask) => {
+                    if (subtask.trim()) {
+                        txtContent += `      - ${subtask}\n`;
+                    }
                 });
             }
             txtContent += "\n";
@@ -29,6 +42,7 @@ async function uploadToGoogleDrive(format) {
     } else {
         fileName = 'daily_planner.html';
         mimeType = 'text/html';
+        // Generate HTML content
         let htmlContent = `
         <!DOCTYPE html>
         <html lang="en">
@@ -37,35 +51,110 @@ async function uploadToGoogleDrive(format) {
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>Daily Planner</title>
             <style>
-                body { font-family: Arial, sans-serif; padding: 20px; }
-                h1 { text-align: center; }
-                .task { margin-bottom: 20px; }
-                .task-title { font-weight: bold; }
-                .subtask { margin-left: 20px; }
+                body {
+                    font-family: 'Arial', sans-serif;
+                    padding: 20px;
+                    background-color: #f9f9f9;
+                    color: #333;
+                    margin: 0;
+                }
+                h1 {
+                    text-align: center;
+                    color: #4a90e2;
+                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                    font-size: 2.5em;
+                    margin-bottom: 30px;
+                }
+                .task {
+                    background-color: #ffffff;
+                    border-radius: 10px;
+                    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                    padding: 20px;
+                    margin-bottom: 20px;
+                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                }
+                .task h2 {
+                    font-size: 1.5em;
+                    margin-bottom: 10px;
+                    display: flex;
+                    align-items: center;
+                }
+                .task h2 input[type="checkbox"] {
+                    margin-right: 15px;
+                    transform: scale(1.5);
+                }
+                .task p {
+                    margin: 5px 0;
+                    font-size: 1.1em;
+                }
+                .label {
+                    font-weight: bold;
+                    color: #555;
+                }
+                .emphasis {
+                    color: #d9534f;
+                }
+                .highlight {
+                    background-color: #ffeb3b;
+                    padding: 2px 5px;
+                    border-radius: 3px;
+                }
+                .note {
+                    font-style: italic;
+                    color: #777;
+                }
+                ul {
+                    list-style-type: none;
+                    padding-left: 0;
+                    margin-top: 10px;
+                }
+                ul li {
+                    font-size: 1.1em;
+                    margin-bottom: 8px;
+                    display: flex;
+                    align-items: center;
+                }
+                ul li input[type="checkbox"] {
+                    margin-right: 15px;
+                    transform: scale(1.2);
+                }
+                h3 {
+                    margin-top: 15px;
+                    font-size: 1.3em;
+                    color: #333;
+                    font-weight: bold;
+                }
             </style>
         </head>
         <body>
             <h1>Daily Planner</h1>
         `;
-        tasks.forEach((task, index) => {
-            htmlContent += `
-            <div class="task">
-                <p class="task-title">${index + 1}. ${task.taskTitle}</p>
-                <p>Date: ${task.date}</p>
-                <p>Start Time: ${task.startTime}</p>
-                <p>Duration: ${task.hours}h ${task.minutes}m</p>
-                <p>Note: ${task.note}</p>
-                ${task.subtasks.length > 0 ? '<p>Subtasks:</p>' : ''}
-                <ul>
-            `;
-            task.subtasks.forEach((subtask, subIndex) => {
-                htmlContent += `<li class="subtask">${index + 1}.${subIndex + 1} ${subtask}</li>`;
-            });
-            htmlContent += `
-                </ul>
-            </div>
-            `;
+    
+        tasks.forEach((task) => {
+            htmlContent += `<div class="task">`;
+            
+            if (task.taskTitle.trim()) {
+                htmlContent += `<h2><input type="checkbox" class="task-checkbox">${task.taskTitle}</h2>`;
+            }
+            if (task.date.trim()) {
+                htmlContent += `<p class="label">Date: <span class="emphasis">${task.date}</span></p>`;
+            }
+            if (task.startTime.trim()) {
+                htmlContent += `<p class="label">Start Time: <span class="emphasis">${task.startTime}</span></p>`;
+            }
+            if (task.hours.trim() || task.minutes.trim()) {
+                htmlContent += `<p class="label">Duration: <span class="highlight">${task.hours ? `${task.hours}h` : ''} ${task.minutes ? `${task.minutes}m` : ''}</span></p>`;
+            }
+            if (task.note.trim()) {
+                htmlContent += `<p class="label">Note: <span class="note">${task.note}</span></p>`;
+            }
+            if (task.subtasks.length > 0) {
+                htmlContent += '<h3>Subtasks:</h3><ul>' + task.subtasks.map(subtask => subtask.trim() ? `<li><input type="checkbox" class="subtask-checkbox">${subtask}</li>` : '').join('') + '</ul>';
+            }
+            
+            htmlContent += `</div>`;
         });
+    
         htmlContent += `
         </body>
         </html>
@@ -82,8 +171,8 @@ async function uploadToGoogleDrive(format) {
     form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
     form.append('file', fileContent);
 
-    const accessToken = gapi.auth.getToken().access_token;
     try {
+        const accessToken = gapi.auth.getToken().access_token;
         const response = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
             method: 'POST',
             headers: new Headers({ 'Authorization': 'Bearer ' + accessToken }),
@@ -91,6 +180,7 @@ async function uploadToGoogleDrive(format) {
         });
         const file = await response.json();
         console.log('File uploaded to Google Drive with ID:', file.id);
+        showAlert('File successfully uploaded to Google Drive.');
     } catch (error) {
         console.error('Error uploading file to Google Drive:', error);
         showAlert('Failed to upload to Google Drive. Please try again.');
