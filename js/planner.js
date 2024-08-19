@@ -4,13 +4,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const storedTasks = loadTasksFromLocalStorage();
     let taskCounter = storedTasks.length + 1;
 
-    taskList.innerHTML = '';
-
-    storedTasks.forEach((task, index) => {
-        if (task.taskTitle.trim() !== '') {
-            addTask(task.taskTitle, task.startTime, task.hours, task.minutes, task.date, task.note, task.subtasks, index + 1);
-        }
-    });
+    storedTasks.forEach((task, index) => addTask(task.taskTitle, task.startTime, task.hours, task.minutes, task.date, task.note, task.subtasks, index + 1));
 
     const downloadModal = document.getElementById('download-modal');
     const uploadModal = document.getElementById('upload-modal');
@@ -154,24 +148,32 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function deleteTask(button) {
-        const li = button.closest('li');
-        if (li) {
-            li.remove();
-            renumberTasks();
-            saveTasksToLocalStorage();
-        }
+        showAlert('Are you sure you want to delete this task?', () => {
+            const li = button.closest('li');
+            if (li) {
+                li.remove();
+                renumberTasks();
+                saveTasksToLocalStorage();
+            }
+        });
     }
 
     function renumberTasks() {
         const tasks = document.querySelectorAll('#task-list li');
         tasks.forEach((li, index) => {
             const taskTitle = li.querySelector('.task-title');
-            if (taskTitle) {
-                const newTaskNumber = index + 1;
-                taskTitle.textContent = `${newTaskNumber}. ${taskTitle.textContent.split('. ')[1]}`;
-                li.dataset.taskNumber = newTaskNumber;
-            }
+            const newTaskNumber = index + 1;
+            taskTitle.textContent = `${newTaskNumber}. ${taskTitle.textContent.split('. ')[1]}`;
+            li.dataset.taskNumber = newTaskNumber;
         });
+    }
+
+    function toggleComplete(button) {
+        const li = button.closest('li');
+        if (li) {
+            li.classList.toggle('completed');
+            saveTasksToLocalStorage();
+        }
     }
 
     function addSubtask(button) {
@@ -183,7 +185,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const taskNumber = button.closest('li').dataset.taskNumber;
             const subtaskNumber = ul.children.length + 1;
             subtaskLi.className = 'subtask';
-            subtaskLi.innerHTML = `<span class="subtask-title">${taskNumber}.${subtaskNumber} ${subtaskValue}</span> <i class="fas fa-trash delete" onclick="deleteSubtask(this)" style="color: red;"></i>`;
+            subtaskLi.innerHTML = `<span class="subtask-title">${taskNumber}.${subtaskNumber}</span> ${subtaskValue} <i class="fas fa-trash delete" onclick="deleteSubtask(this)" style="color: red;"></i>`;
             ul.appendChild(subtaskLi);
             subtaskInput.value = '';
             saveTasksToLocalStorage();
@@ -194,14 +196,6 @@ document.addEventListener('DOMContentLoaded', function () {
         const subtaskLi = button.closest('li');
         if (subtaskLi) {
             subtaskLi.remove();
-            saveTasksToLocalStorage();
-        }
-    }
-
-    function toggleComplete(button) {
-        const li = button.closest('li');
-        if (li) {
-            li.classList.toggle('completed');
             saveTasksToLocalStorage();
         }
     }
@@ -245,9 +239,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                 }
             );
-            if (taskTitle.trim() !== '') {
-                tasks.push({ taskTitle, startTime, hours, minutes, date, note, subtasks });
-            }
+            tasks.push({ taskTitle, startTime, hours, minutes, date, note, subtasks });
         });
         localStorage.setItem('tasks', JSON.stringify(tasks));
     }
@@ -275,7 +267,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function getFormattedDate() {
         const today = new Date();
         const year = today.getFullYear();
-        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const month = String(today.getMonth() + 1).padStart(2, '0'); // Months are zero-based
         const day = String(today.getDate()).padStart(2, '0');
         return `${year}-${month}-${day}`;
     }
