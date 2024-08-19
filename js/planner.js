@@ -105,7 +105,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 <textarea placeholder="Add a note">${note}</textarea>
             </div>
             <ul class="subtask-list">
-                ${subtasks.map(subtask => `<li class="subtask"><span class="subtask-title">${subtask}</span> <button class="delete" onclick="deleteSubtask(this)"><i class="fas fa-trash-alt" style="color: red;"></i></button><hr></li>`).join('')}
+                ${subtasks.map(subtask => `<li class="subtask"><span class="subtask-title">${subtask}</span> <i class="fas fa-trash delete" onclick="deleteSubtask(this)" style="color: red;"></i></li>`).join('')}
             </ul>
             <div class="subtask-input">
                 <input type="text" placeholder="Add subtask">
@@ -174,7 +174,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const taskNumber = button.closest('li').dataset.taskNumber;
             const subtaskNumber = ul.children.length + 1;
             subtaskLi.className = 'subtask';
-            subtaskLi.innerHTML = `<span class="subtask-title">${taskNumber}.${subtaskNumber}</span> ${subtaskValue} <button class="delete" onclick="deleteSubtask(this)"><i class="fas fa-trash-alt" style="color: red;"></i></button><hr>`;
+            subtaskLi.innerHTML = `<span class="subtask-title">${taskNumber}.${subtaskNumber}</span> ${subtaskValue} <i class="fas fa-trash delete" onclick="deleteSubtask(this)" style="color: red;"></i>`;
             ul.appendChild(subtaskLi);
             subtaskInput.value = '';
             saveTasksToLocalStorage();
@@ -334,7 +334,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 <ul>
             `;
             task.subtasks.forEach((subtask, subIndex) => {
-                htmlContent += `<li class="subtask"><input type="checkbox"> ${subtask}</li>`;
+                htmlContent += `<li class="subtask"><input type="checkbox" onclick="this.disabled = true; this.nextSibling.textContent += ' (Completed on ${new Date().toLocaleString()})';"> ${subtask}</li>`;
             });
             htmlContent += `
                 </ul>

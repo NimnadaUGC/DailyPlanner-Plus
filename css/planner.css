@@ -590,6 +590,7 @@ body.dark-mode .task-time select {
     display: none;
     max-width: 300px;
     text-align: center;
+    font-family: inherit;
 }
 
 body.dark-mode .custom-alert {
@@ -599,6 +600,7 @@ body.dark-mode .custom-alert {
 
 .custom-alert p {
     margin: 0 0 20px;
+    font-family: inherit;
 }
 
 .custom-alert button {
