@@ -10,7 +10,6 @@ async function uploadToGoogleDrive(format) {
     if (format === 'txt') {
         fileName = 'daily_planner.txt';
         mimeType = 'text/plain';
-        // Generate TXT content
         let txtContent = "Daily Planner Tasks:\n\n";
         tasks.forEach((task) => {
             if (task.taskTitle.trim()) {
@@ -42,7 +41,6 @@ async function uploadToGoogleDrive(format) {
     } else {
         fileName = 'daily_planner.html';
         mimeType = 'text/html';
-        // Generate HTML content
         let htmlContent = `
         <!DOCTYPE html>
         <html lang="en">
@@ -172,10 +170,11 @@ async function uploadToGoogleDrive(format) {
     form.append('file', fileContent);
 
     try {
-        // Use the updated method to get the access token
-        const tokenResponse = await google.accounts.oauth2.getAccessToken();
-        const accessToken = tokenResponse.access_token;
-        
+        // Use the gapi.auth2 instance to get the token
+        const authInstance = gapi.auth2.getAuthInstance();
+        const user = authInstance.currentUser.get();
+        const accessToken = user.getAuthResponse().access_token;
+
         const response = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
             method: 'POST',
             headers: new Headers({ 'Authorization': 'Bearer ' + accessToken }),
