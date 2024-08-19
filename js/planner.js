@@ -98,7 +98,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 <textarea placeholder="Add a note">${note}</textarea>
             </div>
             <ul class="subtask-list">
-                ${subtasks.map(subtask => `<li class="subtask"><span class="subtask-title">${subtask}</span> <button class="delete" onclick="deleteSubtask(this)"><i class="fas fa-times" style="color: red;"></i> Delete</button><hr></li>`).join('')}
+                ${subtasks.map(subtask => `<li class="subtask"><span class="subtask-title">${subtask}</span> <button class="delete" onclick="deleteSubtask(this)"><i class="fas fa-trash-alt" style="color: red;"></i> Delete</button><hr></li>`).join('')}
             </ul>
             <div class="subtask-input">
                 <input type="text" placeholder="Add subtask">
@@ -165,7 +165,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const taskNumber = button.closest('li').dataset.taskNumber;
             const subtaskNumber = ul.children.length + 1;
             subtaskLi.className = 'subtask';
-            subtaskLi.innerHTML = `<span class="subtask-title">${taskNumber}.${subtaskNumber}</span> ${subtaskValue} <button class="delete" onclick="deleteSubtask(this)"><i class="fas fa-times" style="color: red;"></i> Delete</button><hr>`;
+            subtaskLi.innerHTML = `<span class="subtask-title">${taskNumber}.${subtaskNumber}</span> ${subtaskValue} <button class="delete" onclick="deleteSubtask(this)"><i class="fas fa-trash-alt" style="color: red;"></i> Delete</button><hr>`;
             ul.appendChild(subtaskLi);
             subtaskInput.value = '';
             saveTasksToLocalStorage();
@@ -351,10 +351,20 @@ document.addEventListener('DOMContentLoaded', function () {
 
     async function handleAuthClick() {
         try {
+            // Ensure gapi is fully loaded and initialized
+            await gapi.load('client:auth2');
+            await gapi.auth2.init({
+                client_id: config.googleClientId
+            });
+
             const authInstance = gapi.auth2.getAuthInstance();
-            await authInstance.signIn();
-            document.getElementById('upload-button').disabled = false;
-            showAlert('Google Drive authorized. You can now upload your files.');
+            if (authInstance) {
+                await authInstance.signIn();
+                document.getElementById('upload-button').disabled = false;
+                showAlert('Google Drive authorized. You can now upload your files.');
+            } else {
+                throw new Error('Google Auth Instance not initialized');
+            }
         } catch (error) {
             console.error('Error during authentication:', error);
             showAlert('Failed to authorize Google Drive.');

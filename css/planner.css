@@ -326,7 +326,7 @@ body.dark-mode .task-actions button:hover {
 .google-buttons {
     margin-top: 20px;
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
     width: 100%;
 }
 
@@ -386,13 +386,17 @@ body .icon-button[disabled] {
 
 .modal-content {
     background-color: #fefefe;
-    margin: 15% auto;
+    margin: auto;
     padding: 20px;
     border: 1px solid #888;
     width: 80%;
     max-width: 400px;
     text-align: center;
     border-radius: 10px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
 body.dark-mode .modal-content {
@@ -480,6 +484,11 @@ body.dark-mode .subtask-list li {
     color: white;
 }
 
+.subtask-input {
+    display: flex;
+    align-items: center;
+}
+
 .subtask-input input[type="text"] {
     font-family: inherit;
     padding: 5px;
@@ -508,6 +517,7 @@ body.dark-mode .subtask-input input[type="text"] {
     cursor: pointer;
     font-size: 0.8em;
     transition: background-color 0.3s;
+    margin-left: 10px;
 }
 
 .subtask-input button:hover {
@@ -567,7 +577,7 @@ body.dark-mode .task-time select {
 /* Custom Alert Styles */
 .custom-alert {
     position: fixed;
-    top: 20%;
+    top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     background-color: #fff;
