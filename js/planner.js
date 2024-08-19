@@ -81,7 +81,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 <span class="task-title">${taskNumber}. ${taskText}</span>
                 <br>
                 <div class="task-time">
+                    <label>Date: <input type="date" value="${defaultDate}"></label>
+                    <br>
                     <label>Start Time: <input type="time" class="start-time" value="${startTime}"></label>
+                    <br>
                     <label>Expected Duration: 
                         <select class="expected-hours">
                             ${generateHoursOptions(hours)}
@@ -90,7 +93,6 @@ document.addEventListener('DOMContentLoaded', function () {
                             ${generateMinutesOptions(minutes)}
                         </select>
                     </label>
-                    <label>Date: <input type="date" value="${defaultDate}"></label>
                 </div>
                 <div class="task-actions">
                     <button class="edit" onclick="editTask(this)"><i class="fas fa-pencil-alt" style="color: orange;"></i> Edit</button>
@@ -137,11 +139,37 @@ document.addEventListener('DOMContentLoaded', function () {
         const taskTitle = li.querySelector('.task-title');
         if (taskTitle) {
             currentEditTask = li;
-            document.getElementById('edit-task-input').value = taskTitle.textContent.split('. ')[1];
-            document.getElementById('edit-task-input').style.fontFamily = getComputedStyle(document.body).fontFamily;
+            const editTaskInput = document.getElementById('edit-task-input');
+    
+            // Set the value and inherit font
+            editTaskInput.value = taskTitle.textContent.split('. ')[1];
+            editTaskInput.style.fontFamily = getComputedStyle(document.body).fontFamily;
+    
+            // Common styles for both light and dark modes
+            editTaskInput.style.padding = '10px';
+            editTaskInput.style.borderRadius = '5px';
+            editTaskInput.style.borderStyle = 'solid';
+            editTaskInput.style.borderWidth = '1px';
+            editTaskInput.style.width = '100%'; // Make the input full width
+            editTaskInput.style.boxSizing = 'border-box'; // Ensure padding is included in the width
+    
+            // Check if dark mode is active
+            const isDarkMode = document.body.classList.contains('dark-mode');
+    
+            if (isDarkMode) {
+                editTaskInput.style.backgroundColor = '#333'; // Dark background
+                editTaskInput.style.color = '#fff'; // Light text color
+                editTaskInput.style.borderColor = '#666'; // Dark border
+            } else {
+                editTaskInput.style.backgroundColor = '#fff'; // Light background
+                editTaskInput.style.color = '#000'; // Dark text color
+                editTaskInput.style.borderColor = '#ccc'; // Light border
+            }
+    
+            // Display the modal
             editTaskModal.style.display = 'block';
         }
-    }
+    }       
 
     function deleteTask(button) {
         showAlert('Are you sure you want to delete this task?', () => {
