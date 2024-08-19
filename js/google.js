@@ -79,20 +79,32 @@ async function uploadToGoogleDrive(format) {
         mimeType: mimeType
     };
 
-    const form = new FormData();
-    form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
-    form.append('file', fileContent);
-
-    const accessToken = gapi.auth.getToken().access_token;
     try {
-        const response = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
-            method: 'POST',
-            headers: new Headers({ 'Authorization': 'Bearer ' + accessToken }),
-            body: form
+        const accessToken = gapi.auth.getToken().access_token;
+        if (!accessToken) {
+            showAlert('Google Drive authorization failed. Please try again.');
+            return;
+        }
+
+        showAlert('Uploading to Google Drive...');
+
+        const response = await gapi.client.drive.files.create({
+            resource: metadata,
+            media: {
+                mimeType: mimeType,
+                body: fileContent
+            },
+            fields: 'id'
         });
-        const file = await response.json();
-        console.log('File uploaded to Google Drive with ID:', file.id);
+
+        if (response.status === 200) {
+            showAlert('File uploaded successfully!');
+            console.log('File uploaded to Google Drive with ID:', response.result.id);
+        } else {
+            throw new Error('Upload failed.');
+        }
     } catch (error) {
         console.error('Error uploading file to Google Drive:', error);
+        showAlert('Failed to upload to Google Drive.');
     }
 }

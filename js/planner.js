@@ -67,8 +67,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 </div>
                 <input type="date" value="${defaultDate}">
                 <div class="task-actions">
-                    <button class="edit" onclick="editTask(this)"><i class="fas fa-pencil-alt" style="color: orange;"></i></button>
-                    <button class="delete" onclick="deleteTask(this)"><i class="fas fa-times" style="color: red;"></i></button>
+                    <button class="edit" onclick="editTask(this)"><i class="fas fa-pencil-alt" style="color: orange;"></i> Edit</button>
+                    <button class="delete" onclick="deleteTask(this)"><i class="fas fa-trash-alt" style="color: red;"></i> Delete</button>
                 </div>
             </div>
             <div class="note">
@@ -439,4 +439,19 @@ document.addEventListener('DOMContentLoaded', function () {
         taskList.innerHTML = '';
         taskCounter = 1;
     };
+
+    document.getElementById('authorize-button').addEventListener('click', handleAuthClick);
+    document.getElementById('upload-button').addEventListener('click', () => uploadToGoogleDrive('txt'));
+
+    async function handleAuthClick() {
+        try {
+            const authInstance = gapi.auth2.getAuthInstance();
+            await authInstance.signIn();
+            document.getElementById('upload-button').disabled = false;
+            showAlert('Google Drive authorized. You can now upload your files.');
+        } catch (error) {
+            console.error('Error during authentication:', error);
+            showAlert('Failed to authorize Google Drive.');
+        }
+    }
 });

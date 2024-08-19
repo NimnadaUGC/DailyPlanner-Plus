@@ -178,7 +178,6 @@ body.dark-mode #planner-heading {
 
 .planner-input {
     display: flex;
-    flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
     position: sticky;
@@ -230,6 +229,27 @@ body.dark-mode .planner-input button {
 
 body.dark-mode .planner-input button:hover {
     background-color: #FFA000;
+}
+
+.clear-all-tasks {
+    font-size: 1.5em;
+    background: transparent;
+    color: #FF4D4D;
+    border: none;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.clear-all-tasks:hover {
+    color: #FF0000;
+}
+
+body.dark-mode .clear-all-tasks {
+    color: #FF4D4D;
+}
+
+body.dark-mode .clear-all-tasks:hover {
+    color: #FF0000;
 }
 
 #task-list {
@@ -295,10 +315,6 @@ body.dark-mode #task-list li {
     color: red;
 }
 
-.task-actions .complete {
-    color: green;
-}
-
 .task-actions button:hover {
     color: #2196F3;
 }
@@ -307,133 +323,73 @@ body.dark-mode .task-actions button:hover {
     color: #FFC107;
 }
 
-#task-list .note textarea {
-    font-family: inherit;
-    width: 400%;
-    max-width: 100%;
-    padding: 10px;
-    margin-top: 5px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    background: white;
-    color: black;
-    resize: vertical;
-    height: 100px;
-}
-
-body.dark-mode #task-list .note textarea {
-    background: #333;
-    color: white;
-    border-color: #666;
-}
-
-.subtask {
-    margin-top: 10px;
-    padding-left: 20px;
-    list-style-type: decimal;
-    font-size: 0.9em;
-}
-
-.subtask hr {
-    width: 100%;
-    border: none;
-    border-top: 1px solid #ccc;
-    margin-top: 10px;
-}
-
-body.dark-mode .subtask hr {
-    border-top-color: #666;
-}
-
-.subtask-input {
+.google-buttons {
+    margin-top: 20px;
     display: flex;
-    margin-top: 10px;
+    justify-content: space-around;
     width: 100%;
-    font-size: 0.9em;
 }
 
-.subtask-input input[type="text"] {
-    font-family: inherit;
-    flex: 1;
-    padding: 8px;
-    margin-right: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    background: white;
-    color: black;
-}
-
-body.dark-mode .subtask-input input[type="text"] {
-    background: #333;
-    color: white;
-    border-color: #666;
-}
-
-.subtask-input button {
-    font-family: inherit;
-    padding: 8px 12px;
+.icon-button {
+    display: flex;
+    align-items: center;
+    padding: 10px 20px;
+    font-size: 16px;
     border: none;
+    cursor: pointer;
     background-color: #2196F3;
     color: white;
     border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.9em;
-    transition: background-color 0.3s;
+    font-family: inherit;
+    transition: background-color 0.3s, color 0.3s;
 }
 
-.subtask-input button:hover {
+.icon-button i {
+    margin-right: 10px;
+}
+
+.icon-button:hover {
     background-color: #1976D2;
 }
 
-body.dark-mode .subtask-input button {
+body.dark-mode .icon-button {
     background-color: #FFC107;
     color: black;
 }
 
-body.dark-mode .subtask-input button:hover {
+body.dark-mode .icon-button:hover {
     background-color: #FFA000;
 }
 
-.subtask-input .delete {
-    font-size: 0.8em;
-    color: red;
-}
-
-.subtask-input .delete:hover {
-    color: #FF4D4D;
-}
-
-.subtask-list .delete {
-    font-size: 0.8em;
-    color: red;
-    margin-left: 10px;
-}
-
-.subtask-list .delete:hover {
-    color: #FF4D4D;
-}
-
-.custom-alert {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: #fff;
-    border: 1px solid #ccc;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    z-index: 1000;
+.modal {
     display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5);
 }
 
-.custom-alert.dark-mode {
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 400px;
+    text-align: center;
+    border-radius: 10px;
+}
+
+body.dark-mode .modal-content {
     background-color: #333;
     color: white;
-    border-color: #666;
 }
 
-.custom-alert button {
+.modal-content button {
     font-family: inherit;
     padding: 10px 20px;
     border: none;
@@ -441,21 +397,35 @@ body.dark-mode .subtask-input button:hover {
     color: white;
     border-radius: 4px;
     cursor: pointer;
-    font-size: 1em;
+    margin: 10px;
     transition: background-color 0.3s;
 }
 
-.custom-alert button:hover {
+.modal-content button:hover {
     background-color: #1976D2;
 }
 
-body.dark-mode .custom-alert button {
+body.dark-mode .modal-content button {
     background-color: #FFC107;
     color: black;
 }
 
-body.dark-mode .custom-alert button:hover {
+body.dark-mode .modal-content button:hover {
     background-color: #FFA000;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
 }
 
 @media (max-width: 600px) {
@@ -475,103 +445,89 @@ body.dark-mode .custom-alert button:hover {
     #task-list .note textarea {
         width: 100%;
     }
+
+    .modal-content {
+        width: 90%;
+    }
 }
 
-.google-buttons {
-    margin-top: 20px;
+/* Subtask Section Styling */
+.subtask-list li {
+    font-family: inherit;
+    background: inherit;
+    color: inherit;
+    padding: 5px;
+    border-radius: 4px;
     display: flex;
-    justify-content: space-around;
-    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+    transition: background 0.3s, color 0.3s;
 }
 
-.dropdown {
-    position: relative;
-    display: inline-block;
-}
-
-.dropbtn {
-    background-color: #2196F3;
+body.dark-mode .subtask-list li {
+    background: #333;
     color: white;
-    padding: 10px 20px;
-    font-size: 16px;
+}
+
+.subtask-input input[type="text"] {
+    font-family: inherit;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: calc(70% - 20px);
+    font-size: 1em;
+    background: white;
+    color: black;
+    transition: background 0.3s, color 0.3s, border-color 0.3s;
+}
+
+body.dark-mode .subtask-input input[type="text"] {
+    background: #333;
+    color: white;
+    border-color: #666;
+}
+
+/* Custom Alert Styles */
+.custom-alert {
+    position: fixed;
+    top: 20%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    z-index: 1001;
+    display: none;
+    max-width: 300px;
+    text-align: center;
+}
+
+body.dark-mode .custom-alert {
+    background-color: #444;
+    color: white;
+}
+
+.custom-alert p {
+    margin: 0 0 20px;
+}
+
+.custom-alert button {
+    background-color: #2196F3;
     border: none;
+    padding: 10px 20px;
+    color: white;
     cursor: pointer;
     border-radius: 4px;
+    font-family: inherit;
     transition: background-color 0.3s;
 }
 
-.dropdown-content {
-    display: none;
-    position: absolute;
-    background-color: #f9f9f9;
-    min-width: 160px;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    z-index: 1;
-}
-
-.dropdown-content a {
-    color: black;
-    padding: 12px 16px;
-    text-decoration: none;
-    display: block;
-}
-
-.dropdown-content a:hover {
-    background-color: #f1f1f1;
-}
-
-.dropdown:hover .dropdown-content {
-    display: block;
-}
-
-.dropdown:hover .dropbtn {
-    background-color: #1976D2;
-}
-
-body.dark-mode .dropdown-content {
-    background-color: #333;
-    color: white;
-    box-shadow: 0px 8px 16px 0px rgba(255, 255, 255, 0.2);
-}
-
-body.dark-mode .dropdown-content a {
-    color: white;
-}
-
-body.dark-mode .dropdown-content a:hover {
-    background-color: #444;
-}
-
-body.dark-mode .dropbtn {
+body.dark-mode .custom-alert button {
     background-color: #FFC107;
     color: black;
 }
 
-body.dark-mode .dropbtn:hover {
-    background-color: #FFA000;
-}
-
-.clear-all-tasks {
-    padding: 10px 20px;
-    border: none;
-    background-color: #FF4D4D;
-    color: white;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 1em;
-    transition: background-color 0.3s;
-    margin-left: 10px;
-}
-
-.clear-all-tasks:hover {
-    background-color: #FF0000;
-}
-
-body.dark-mode .clear-all-tasks {
-    background-color: #FF4D4D;
-    color: white;
-}
-
-body.dark-mode .clear-all-tasks:hover {
-    background-color: #FF0000;
+.custom-alert button:hover {
+    background-color: #1976D2;
 }
