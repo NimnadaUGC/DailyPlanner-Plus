@@ -177,6 +177,8 @@ body.dark-mode #planner-heading {
 }
 
 .planner-input {
+    display: flex;
+    flex-wrap: wrap; /* Allows wrapping to the next line if needed */
     justify-content: space-between;
     align-items: center;
     position: sticky;
@@ -192,11 +194,13 @@ body.dark-mode #planner-heading {
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 4px;
-    width: calc(85% - 20px);
+    width: 100%; /* Full width on small screens */
+    max-width: 100%; /* Ensures no overflow */
     font-size: 1em;
     background: white;
     color: black;
     transition: background 0.3s, color 0.3s, border-color 0.3s;
+    box-sizing: border-box; /* Includes padding and border in the width */
 }
 
 body.dark-mode .planner-input input[type="text"] {
@@ -215,6 +219,30 @@ body.dark-mode .planner-input input[type="text"] {
     cursor: pointer;
     font-size: 1em;
     transition: background-color 0.3s;
+    width: calc(50% - 10px); /* Makes buttons take half the width */
+    margin-top: 10px; /* Adds spacing between rows on small screens */
+}
+
+body.dark-mode .planner-input button {
+    background-color: #FFC107;
+    color: black;
+}
+
+/* Responsive behavior */
+@media (max-width: 768px) {
+    .planner-input {
+        flex-direction: column; /* Stack items vertically on small screens */
+        align-items: stretch;
+    }
+
+    .planner-input input[type="text"] {
+        margin-bottom: 10px; /* Adds space below the input on small screens */
+    }
+
+    .planner-input button {
+        width: 100%; /* Full width on small screens */
+        margin-top: 0; /* Reset margin when buttons are stacked */
+    }
 }
 
 .planner-input button:hover {
