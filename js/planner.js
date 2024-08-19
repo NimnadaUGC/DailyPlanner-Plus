@@ -321,36 +321,47 @@ document.addEventListener('DOMContentLoaded', function () {
             <style>
                 body { font-family: Arial, sans-serif; padding: 20px; }
                 h1 { text-align: center; }
-                .task { margin-bottom: 20px; }
-                .task-title { font-weight: bold; }
+                table { width: 100%; border-collapse: collapse; }
+                th, td { padding: 8px 12px; border: 1px solid #ddd; text-align: left; }
+                th { background-color: #f4f4f4; }
                 .subtask { margin-left: 20px; }
             </style>
+            <script>
+                function toggleTaskCompletion(taskId) {
+                    var taskRow = document.getElementById(taskId);
+                    taskRow.classList.toggle('completed');
+                }
+            </script>
         </head>
         <body>
             <h1>Daily Planner</h1>
+            <table>
+                <tr>
+                    <th>Task</th>
+                    <th>Date</th>
+                    <th>Start Time</th>
+                    <th>Duration</th>
+                    <th>Notes</th>
+                </tr>
         `;
 
         tasks.forEach((task, index) => {
             htmlContent += `
-            <div class="task">
-                <p class="task-title">${index + 1}. ${task.taskTitle}</p>
-                <p>Date: ${task.date}</p>
-                <p>Start Time: ${task.startTime}</p>
-                <p>Duration: ${task.hours}h ${task.minutes}m</p>
-                <p>Note: ${task.note}</p>
-                ${task.subtasks.length > 0 ? '<p>Subtasks:</p>' : ''}
-                <ul>
-            `;
-            task.subtasks.forEach((subtask, subIndex) => {
-                htmlContent += `<li class="subtask">${index + 1}.${subIndex + 1} ${subtask}</li>`;
-            });
-            htmlContent += `
-                </ul>
-            </div>
+            <tr id="task-${index + 1}">
+                <td>
+                    ${task.taskTitle}
+                    ${task.subtasks.length > 0 ? '<ul>' + task.subtasks.map(subtask => `<li class="subtask">${subtask}</li>`).join('') + '</ul>' : ''}
+                </td>
+                <td>${task.date}</td>
+                <td>${task.startTime}</td>
+                <td>${task.hours}h ${task.minutes}m</td>
+                <td>${task.note}</td>
+            </tr>
             `;
         });
 
         htmlContent += `
+            </table>
         </body>
         </html>
         `;
