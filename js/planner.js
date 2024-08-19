@@ -412,7 +412,7 @@ document.addEventListener('DOMContentLoaded', function () {
         a.download = `daily_planner_${getFormattedDate()}.html`;
         a.click();
         URL.revokeObjectURL(url);
-    }
+    }    
 
     function getFormattedDate() {
         const today = new Date();

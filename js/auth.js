@@ -1,3 +1,17 @@
+// auth.js
+
+// Ensure the DOM is fully loaded before trying to access elements
+document.addEventListener('DOMContentLoaded', function () {
+    const authorizeButton = document.getElementById('authorize-button');
+    if (authorizeButton) {
+        authorizeButton.onclick = handleAuthClick;
+    } else {
+        console.error("Authorize button not found");
+    }
+
+    loadAndInitGapi();
+});
+
 // Function to load the Google API client library and initialize it
 async function loadAndInitGapi() {
     try {
@@ -22,7 +36,7 @@ async function loadAndInitGapi() {
         }
     } catch (error) {
         console.error('Error during GAPI initialization:', error);
-        showAlert('Failed to initialize Google API client.');
+        showAlert(`Failed to initialize Google API client. ${error.message}`);
     }
 }
 
@@ -44,8 +58,25 @@ async function handleAuthClick() {
     }
 }
 
-// Function to load and initialize the Google API client after DOM content is loaded
-document.addEventListener('DOMContentLoaded', loadAndInitGapi);
-
-// Attach the authentication handler to the authorize button
-document.getElementById('authorize-button').onclick = handleAuthClick;
+// Define the showAlert function
+function showAlert(message, callback) {
+    const alertBox = document.createElement('div');
+    alertBox.className = 'custom-alert';
+    alertBox.innerHTML = `
+        <p>${message}</p>
+        <button id="alert-ok">OK</button>
+        <button id="alert-cancel">Cancel</button>
+    `;
+    document.body.appendChild(alertBox);
+    alertBox.style.display = 'block';
+    if (document.body.classList.contains('dark-mode')) {
+        alertBox.classList.add('dark-mode');
+    }
+    document.getElementById('alert-ok').onclick = function () {
+        alertBox.remove();
+        if (callback) callback();
+    };
+    document.getElementById('alert-cancel').onclick = function () {
+        alertBox.remove();
+    };
+}
