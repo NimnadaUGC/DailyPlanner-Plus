@@ -251,7 +251,7 @@ document.addEventListener('DOMContentLoaded', function () {
             showAlert('No tasks to download.');
             return;
         }
-
+    
         let htmlContent = `
         <!DOCTYPE html>
         <html lang="en">
@@ -260,41 +260,103 @@ document.addEventListener('DOMContentLoaded', function () {
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>Daily Planner</title>
             <style>
-                body { font-family: Arial, sans-serif; padding: 20px; background-color: #f4f4f4; color: #333; }
-                h1 { text-align: center; color: #4a90e2; }
-                h2 { margin-top: 20px; color: #333; }
-                p { margin: 5px 0; font-size: 1.1em; }
-                ul { list-style-type: disc; padding-left: 20px; }
-                .task-title { font-weight: bold; font-size: 1.2em; }
-                .subtask-title { font-style: italic; }
-                .note { font-style: italic; color: #555; }
-                .label { font-weight: bold; }
-                .emphasis { color: #d9534f; }
-                .highlight { background-color: #ffeb3b; }
+                body {
+                    font-family: 'Arial', sans-serif;
+                    padding: 20px;
+                    background-color: #f9f9f9;
+                    color: #333;
+                    margin: 0;
+                }
+                h1 {
+                    text-align: center;
+                    color: #4a90e2;
+                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                    font-size: 2.5em;
+                    margin-bottom: 30px;
+                }
+                .task {
+                    background-color: #ffffff;
+                    border-radius: 10px;
+                    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                    padding: 20px;
+                    margin-bottom: 20px;
+                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                }
+                .task h2 {
+                    font-size: 1.5em;
+                    margin-bottom: 10px;
+                    display: flex;
+                    align-items: center;
+                }
+                .task h2 input[type="checkbox"] {
+                    margin-right: 15px;
+                    transform: scale(1.5);
+                }
+                .task p {
+                    margin: 5px 0;
+                    font-size: 1.1em;
+                }
+                .label {
+                    font-weight: bold;
+                    color: #555;
+                }
+                .emphasis {
+                    color: #d9534f;
+                }
+                .highlight {
+                    background-color: #ffeb3b;
+                    padding: 2px 5px;
+                    border-radius: 3px;
+                }
+                .note {
+                    font-style: italic;
+                    color: #777;
+                }
+                ul {
+                    list-style-type: none;
+                    padding-left: 0;
+                    margin-top: 10px;
+                }
+                ul li {
+                    font-size: 1.1em;
+                    margin-bottom: 8px;
+                    display: flex;
+                    align-items: center;
+                }
+                ul li input[type="checkbox"] {
+                    margin-right: 15px;
+                    transform: scale(1.2);
+                }
+                h3 {
+                    margin-top: 15px;
+                    font-size: 1.3em;
+                    color: #333;
+                    font-weight: bold;
+                }
             </style>
         </head>
         <body>
             <h1>Daily Planner</h1>
         `;
-
+    
         tasks.forEach((task) => {
             htmlContent += `
             <div class="task">
-                <h2 class="task-title">${task.taskTitle}</h2>
+                <h2><input type="checkbox" class="task-checkbox">${task.taskTitle}</h2>
                 <p class="label">Date: <span class="emphasis">${task.date}</span></p>
                 <p class="label">Start Time: <span class="emphasis">${task.startTime}</span></p>
                 <p class="label">Duration: <span class="highlight">${task.hours}h ${task.minutes}m</span></p>
                 <p class="label">Note: <span class="note">${task.note}</span></p>
-                ${task.subtasks.length > 0 ? '<h3>Subtasks:</h3><ul>' + task.subtasks.map(subtask => `<li class="subtask-title">${subtask}</li>`).join('') + '</ul>' : ''}
+                ${task.subtasks.length > 0 ? '<h3>Subtasks:</h3><ul>' + task.subtasks.map(subtask => `<li><input type="checkbox" class="subtask-checkbox">${subtask}</li>`).join('') + '</ul>' : ''}
             </div>
             `;
         });
-
+    
         htmlContent += `
         </body>
         </html>
         `;
-
+    
         const blob = new Blob([htmlContent], { type: 'text/html' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -303,6 +365,7 @@ document.addEventListener('DOMContentLoaded', function () {
         a.click();
         URL.revokeObjectURL(url);
     }
+    
 
     function getFormattedDate() {
         const today = new Date();
