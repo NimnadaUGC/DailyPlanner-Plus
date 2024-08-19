@@ -1,10 +1,18 @@
 document.addEventListener('DOMContentLoaded', function () {
     const taskInput = document.getElementById('task-input');
     const taskList = document.getElementById('task-list');
-    const storedTasks = loadTasksFromLocalStorage();
+    let storedTasks = loadTasksFromLocalStorage();
     let taskCounter = storedTasks.length + 1;
 
-    storedTasks.forEach((task, index) => addTask(task.taskTitle, task.startTime, task.hours, task.minutes, task.date, task.note, task.subtasks, index + 1));
+    // Clear existing tasks before loading from local storage
+    taskList.innerHTML = '';
+
+    // Load tasks from local storage, filtering out any incomplete or empty tasks
+    storedTasks.forEach((task, index) => {
+        if (task.taskTitle.trim() !== '') {
+            addTask(task.taskTitle, task.startTime, task.hours, task.minutes, task.date, task.note, task.subtasks, index + 1);
+        }
+    });
 
     const downloadModal = document.getElementById('download-modal');
     const uploadModal = document.getElementById('upload-modal');
