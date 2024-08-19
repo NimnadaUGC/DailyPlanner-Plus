@@ -79,7 +79,6 @@ document.addEventListener('DOMContentLoaded', function () {
         li.innerHTML = `
             <div class="task-main">
                 <span class="task-title">${taskText}</span>
-                <input type="checkbox" class="task-checkbox">
                 <br>
                 <div class="task-time">
                     <label>Start Time: <input type="time" class="start-time" value="${startTime}"></label>
@@ -102,7 +101,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 <textarea placeholder="Add a note">${note}</textarea>
             </div>
             <ul class="subtask-list">
-                ${subtasks.map(subtask => `<li class="subtask"><span class="subtask-title">${subtask}</span> <input type="checkbox" class="subtask-checkbox"><i class="fas fa-trash delete" onclick="deleteSubtask(this)" style="color: red;"></i></li>`).join('')}
+                ${subtasks.map(subtask => `<li class="subtask"><span class="subtask-title">${subtask}</span><i class="fas fa-trash delete" onclick="deleteSubtask(this)" style="color: red;"></i></li>`).join('')}
             </ul>
             <div class="subtask-input">
                 <input type="text" placeholder="Add subtask">
@@ -178,7 +177,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const subtaskLi = document.createElement('li');
             const subtaskNumber = ul.children.length + 1;
             subtaskLi.className = 'subtask';
-            subtaskLi.innerHTML = `<span class="subtask-title">${subtaskValue}</span> <input type="checkbox" class="subtask-checkbox"><i class="fas fa-trash delete" onclick="deleteSubtask(this)" style="color: red;"></i>`;
+            subtaskLi.innerHTML = `<span class="subtask-title">${subtaskValue}</span><i class="fas fa-trash delete" onclick="deleteSubtask(this)" style="color: red;"></i>`;
             ul.appendChild(subtaskLi);
             subtaskInput.value = '';
         }
