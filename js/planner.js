@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const storedTasks = loadTasksFromLocalStorage();
     let taskCounter = storedTasks.length + 1;
 
-    storedTasks.forEach((task, index) => addTask(task.taskTitle, task.startTime, task.hours, task.minutes, task.date, task.note, task.subtasks, index + 1));
+    //storedTasks.forEach((task, index) => addTask(task.taskTitle, task.startTime, task.hours, task.minutes, task.date, task.note, task.subtasks, index + 1));
 
     const downloadModal = document.getElementById('download-modal');
     const uploadModal = document.getElementById('upload-modal');
