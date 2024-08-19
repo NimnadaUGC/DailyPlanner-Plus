@@ -8,16 +8,11 @@ document.addEventListener('DOMContentLoaded', function () {
     const clearAllTasksButton = document.getElementById('clear-all-tasks');
     const downloadButton = document.getElementById('download-button');
     const uploadButton = document.getElementById('upload-button');
-    const authorizeButton = document.getElementById('authorize-button');
     const closeButtons = document.querySelectorAll('.close');
     let currentEditTask = null;
 
     downloadButton.onclick = function () {
         downloadModal.style.display = 'block';
-    };
-
-    authorizeButton.onclick = function () {
-        handleAuthClick();
     };
 
     uploadButton.onclick = function () {
@@ -462,25 +457,4 @@ document.addEventListener('DOMContentLoaded', function () {
 
     window.downloadTxt = downloadTxt;
     window.downloadHtml = downloadHtml;
-
-    async function handleAuthClick() {
-        try {
-            await gapi.load('client:auth2');
-            await gapi.auth2.init({
-                client_id: config.googleClientId
-            });
-
-            const authInstance = gapi.auth2.getAuthInstance();
-            if (authInstance) {
-                await authInstance.signIn();
-                document.getElementById('upload-button').disabled = false;
-                showAlert('Google Drive authorized. You can now upload your files.');
-            } else {
-                throw new Error('Google Auth Instance not initialized');
-            }
-        } catch (error) {
-            console.error('Error during authentication:', error);
-            showAlert('Failed to authorize Google Drive.');
-        }
-    }
 });
