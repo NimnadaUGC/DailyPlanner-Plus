@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const downloadModal = document.getElementById('download-modal');
     const uploadModal = document.getElementById('upload-modal');
     const editTaskModal = document.getElementById('edit-task-modal');
+    const clearAllTasksButton = document.getElementById('clear-all-tasks');
     const downloadButton = document.getElementById('download-button');
     const uploadButton = document.getElementById('upload-button');
     const authorizeButton = document.getElementById('authorize-button');
@@ -46,6 +47,12 @@ document.addEventListener('DOMContentLoaded', function () {
         if (event.target === editTaskModal) {
             editTaskModal.style.display = 'none';
         }
+    };
+
+    clearAllTasksButton.onclick = function () {
+        showAlert('Are you sure you want to clear all tasks? This action cannot be undone.', () => {
+            clearAllTasks();
+        });
     };
 
     document.getElementById('save-task-button').onclick = function () {
@@ -98,11 +105,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 <textarea placeholder="Add a note">${note}</textarea>
             </div>
             <ul class="subtask-list">
-                ${subtasks.map(subtask => `<li class="subtask"><span class="subtask-title">${subtask}</span> <button class="delete" onclick="deleteSubtask(this)"><i class="fas fa-trash-alt" style="color: red;"></i> Delete</button><hr></li>`).join('')}
+                ${subtasks.map(subtask => `<li class="subtask"><span class="subtask-title">${subtask}</span> <button class="delete" onclick="deleteSubtask(this)"><i class="fas fa-trash-alt" style="color: red;"></i></button><hr></li>`).join('')}
             </ul>
             <div class="subtask-input">
                 <input type="text" placeholder="Add subtask">
-                <button onclick="addSubtask(this)">Add</button>
+                <button onclick="addSubtask(this)">Add Task</button>
             </div>
         `;
         li.dataset.taskNumber = taskNumber;
@@ -141,11 +148,13 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function deleteTask(button) {
-        const li = button.closest('li');
-        if (li) {
-            li.remove();
-            saveTasksToLocalStorage();
-        }
+        showAlert('Are you sure you want to delete this task?', () => {
+            const li = button.closest('li');
+            if (li) {
+                li.remove();
+                saveTasksToLocalStorage();
+            }
+        });
     }
 
     function toggleComplete(button) {
@@ -165,7 +174,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const taskNumber = button.closest('li').dataset.taskNumber;
             const subtaskNumber = ul.children.length + 1;
             subtaskLi.className = 'subtask';
-            subtaskLi.innerHTML = `<span class="subtask-title">${taskNumber}.${subtaskNumber}</span> ${subtaskValue} <button class="delete" onclick="deleteSubtask(this)"><i class="fas fa-trash-alt" style="color: red;"></i> Delete</button><hr>`;
+            subtaskLi.innerHTML = `<span class="subtask-title">${taskNumber}.${subtaskNumber}</span> ${subtaskValue} <button class="delete" onclick="deleteSubtask(this)"><i class="fas fa-trash-alt" style="color: red;"></i></button><hr>`;
             ul.appendChild(subtaskLi);
             subtaskInput.value = '';
             saveTasksToLocalStorage();
@@ -180,25 +189,26 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    function showAlert(message) {
+    function showAlert(message, callback) {
         const alertBox = document.createElement('div');
         alertBox.className = 'custom-alert';
         alertBox.innerHTML = `
             <p>${message}</p>
-            <button onclick="closeAlert(this)">OK</button>
+            <button id="alert-ok">OK</button>
+            <button id="alert-cancel">Cancel</button>
         `;
         document.body.appendChild(alertBox);
         alertBox.style.display = 'block';
         if (document.body.classList.contains('dark-mode')) {
             alertBox.classList.add('dark-mode');
         }
-    }
-
-    function closeAlert(button) {
-        const alertBox = button.closest('.custom-alert');
-        if (alertBox) {
+        document.getElementById('alert-ok').onclick = function () {
             alertBox.remove();
-        }
+            if (callback) callback();
+        };
+        document.getElementById('alert-cancel').onclick = function () {
+            alertBox.remove();
+        };
     }
 
     function saveTasksToLocalStorage() {
@@ -211,11 +221,13 @@ document.addEventListener('DOMContentLoaded', function () {
             const date = li.querySelector('input[type="date"]') ? li.querySelector('input[type="date"]').value : '';
             const note = li.querySelector('.note textarea') ? li.querySelector('.note textarea').value : '';
             const subtasks = [];
-            li.querySelectorAll('.subtask').forEach(subtask => {
-                if (subtask.querySelector('.subtask-title')) {
-                    subtasks.push(subtask.querySelector('.subtask-title').textContent);
+            li.querySelectorAll('.subtask').forEach(
+                subtask => {
+                    if (subtask.querySelector('.subtask-title')) {
+                        subtasks.push(subtask.querySelector('.subtask-title').textContent);
+                    }
                 }
-            });
+            );
             tasks.push({ taskTitle, startTime, hours, minutes, date, note, subtasks });
         });
         localStorage.setItem('tasks', JSON.stringify(tasks));
@@ -226,14 +238,10 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function clearAllTasks() {
-        if (confirm('Are you sure you want to clear all tasks? This action cannot be undone.')) {
-            localStorage.removeItem('tasks');
-            taskList.innerHTML = '';
-            taskCounter = 1;
-        }
+        localStorage.removeItem('tasks');
+        taskList.innerHTML = '';
+        taskCounter = 1;
     }
-
-    document.getElementById('clear-all-tasks').addEventListener('click', clearAllTasks);
 
     window.addTask = addTask;
     window.editTask = editTask;
