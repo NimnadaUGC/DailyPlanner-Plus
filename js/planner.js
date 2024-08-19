@@ -1,12 +1,19 @@
 document.addEventListener('DOMContentLoaded', function () {
     const taskInput = document.getElementById('task-input');
     const taskList = document.getElementById('task-list');
-    const storedTasks = loadTasksFromLocalStorage();
+    let storedTasks = loadTasksFromLocalStorage();
     let taskCounter = storedTasks.length + 1;
 
-    storedTasks.forEach((task, index) => addTask(task.taskTitle, task.startTime, task.hours, task.minutes, task.date, task.note, task.subtasks, index + 1));
+    // Clear the list before loading tasks from local storage
+    taskList.innerHTML = '';
 
-    // Modal related variables
+    // Load tasks from local storage and add to the list
+    storedTasks.forEach((task, index) => {
+        if (task.taskTitle.trim() !== '') {
+            addTask(task.taskTitle, task.startTime, task.hours, task.minutes, task.date, task.note, task.subtasks, index + 1);
+        }
+    });
+
     const downloadModal = document.getElementById('download-modal');
     const uploadModal = document.getElementById('upload-modal');
     const editTaskModal = document.getElementById('edit-task-modal');
@@ -78,7 +85,8 @@ document.addEventListener('DOMContentLoaded', function () {
         const tomorrow = new Date();
         tomorrow.setDate(tomorrow.getDate() + 1);
         const defaultDate = date || tomorrow.toISOString().split('T')[0];
-        taskNumber = taskNumber || taskCounter;
+
+        taskNumber = taskNumber || taskList.children.length + 1;
 
         li.innerHTML = `
             <div class="task-main">
@@ -105,7 +113,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 <textarea placeholder="Add a note">${note}</textarea>
             </div>
             <ul class="subtask-list">
-                ${subtasks.map(subtask => `<li class="subtask"><span class="subtask-title">${subtask}</span> <button class="delete" onclick="deleteSubtask(this)"><i class="fas fa-trash-alt" style="color: red;"></i></button><hr></li>`).join('')}
+                ${subtasks.map(subtask => `<li class="subtask"><span class="subtask-title">${subtask}</span> <i class="fas fa-trash delete" onclick="deleteSubtask(this)" style="color: red;"></i></li>`).join('')}
             </ul>
             <div class="subtask-input">
                 <input type="text" placeholder="Add subtask">
@@ -115,7 +123,7 @@ document.addEventListener('DOMContentLoaded', function () {
         li.dataset.taskNumber = taskNumber;
         taskList.appendChild(li);
         taskInput.value = '';
-        taskCounter = taskNumber + 1;
+        renumberTasks();
         saveTasksToLocalStorage();
     }
 
@@ -148,21 +156,24 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function deleteTask(button) {
-        showAlert('Are you sure you want to delete this task?', () => {
-            const li = button.closest('li');
-            if (li) {
-                li.remove();
-                saveTasksToLocalStorage();
-            }
-        });
-    }
-
-    function toggleComplete(button) {
         const li = button.closest('li');
         if (li) {
-            li.classList.toggle('completed');
+            li.remove();
+            renumberTasks();
             saveTasksToLocalStorage();
         }
+    }
+
+    function renumberTasks() {
+        const tasks = document.querySelectorAll('#task-list li');
+        tasks.forEach((li, index) => {
+            const taskTitle = li.querySelector('.task-title');
+            if (taskTitle) {
+                const newTaskNumber = index + 1;
+                taskTitle.textContent = `${newTaskNumber}. ${taskTitle.textContent.split('. ')[1]}`;
+                li.dataset.taskNumber = newTaskNumber;
+            }
+        });
     }
 
     function addSubtask(button) {
@@ -174,7 +185,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const taskNumber = button.closest('li').dataset.taskNumber;
             const subtaskNumber = ul.children.length + 1;
             subtaskLi.className = 'subtask';
-            subtaskLi.innerHTML = `<span class="subtask-title">${taskNumber}.${subtaskNumber}</span> ${subtaskValue} <button class="delete" onclick="deleteSubtask(this)"><i class="fas fa-trash-alt" style="color: red;"></i></button><hr>`;
+            subtaskLi.innerHTML = `<span class="subtask-title">${taskNumber}.${subtaskNumber} ${subtaskValue}</span> <i class="fas fa-trash delete" onclick="deleteSubtask(this)" style="color: red;"></i>`;
             ul.appendChild(subtaskLi);
             subtaskInput.value = '';
             saveTasksToLocalStorage();
@@ -228,7 +239,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                 }
             );
-            tasks.push({ taskTitle, startTime, hours, minutes, date, note, subtasks });
+            if (taskTitle.trim() !== '') {
+                tasks.push({ taskTitle, startTime, hours, minutes, date, note, subtasks });
+            }
         });
         localStorage.setItem('tasks', JSON.stringify(tasks));
     }
@@ -249,7 +262,6 @@ document.addEventListener('DOMContentLoaded', function () {
     window.toggleComplete = toggleComplete;
     window.addSubtask = addSubtask;
     window.deleteSubtask = deleteSubtask;
-    window.closeAlert = closeAlert;
 
     window.downloadTxt = downloadTxt;
     window.downloadHtml = downloadHtml;
@@ -263,7 +275,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function downloadTxt() {
-        const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+        const tasks = loadTasksFromLocalStorage();
         if (tasks.length === 0) {
             showAlert('No tasks to download.');
             return;
@@ -285,18 +297,17 @@ document.addEventListener('DOMContentLoaded', function () {
             txtContent += "\n";
         });
 
-        const formattedDate = getFormattedDate();
         const blob = new Blob([txtContent], { type: 'text/plain' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `daily_planner_${formattedDate}.txt`;
+        a.download = `daily_planner_${getFormattedDate()}.txt`;
         a.click();
         URL.revokeObjectURL(url);
     }
 
     function downloadHtml() {
-        const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+        const tasks = loadTasksFromLocalStorage();
         if (tasks.length === 0) {
             showAlert('No tasks to download.');
             return;
@@ -315,7 +326,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 .task { margin-bottom: 20px; }
                 .task-title { font-weight: bold; }
                 .subtask { margin-left: 20px; }
-                .completed { text-decoration: line-through; }
             </style>
         </head>
         <body>
@@ -334,7 +344,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 <ul>
             `;
             task.subtasks.forEach((subtask, subIndex) => {
-                htmlContent += `<li class="subtask"><input type="checkbox"> ${subtask}</li>`;
+                htmlContent += `<li class="subtask">${index + 1}.${subIndex + 1} ${subtask}</li>`;
             });
             htmlContent += `
                 </ul>
@@ -347,19 +357,17 @@ document.addEventListener('DOMContentLoaded', function () {
         </html>
         `;
 
-        const formattedDate = getFormattedDate();
         const blob = new Blob([htmlContent], { type: 'text/html' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `daily_planner_${formattedDate}.html`;
+        a.download = `daily_planner_${getFormattedDate()}.html`;
         a.click();
         URL.revokeObjectURL(url);
     }
 
     async function handleAuthClick() {
         try {
-            // Ensure gapi is fully loaded and initialized
             await gapi.load('client:auth2');
             await gapi.auth2.init({
                 client_id: config.googleClientId
