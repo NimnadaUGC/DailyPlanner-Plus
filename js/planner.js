@@ -11,10 +11,15 @@ document.addEventListener('DOMContentLoaded', function () {
     const uploadModal = document.getElementById('upload-modal');
     const downloadButton = document.getElementById('download-button');
     const uploadButton = document.getElementById('upload-button');
+    const authorizeButton = document.getElementById('authorize-button');
     const closeButtons = document.querySelectorAll('.close');
 
     downloadButton.onclick = function () {
         downloadModal.style.display = 'block';
+    };
+
+    authorizeButton.onclick = function () {
+        handleAuthClick();
     };
 
     uploadButton.onclick = function () {
@@ -328,120 +333,6 @@ document.addEventListener('DOMContentLoaded', function () {
         a.click();
         URL.revokeObjectURL(url);
     }
-
-    async function uploadToGoogleDrive(type) {
-        const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
-        if (tasks.length === 0) {
-            showAlert('No tasks to upload.');
-            return;
-        }
-
-        const formattedDate = getFormattedDate();
-        let content = '';
-        let mimeType = '';
-
-        if (type === 'txt') {
-            let txtContent = "Daily Planner Tasks:\n\n";
-            tasks.forEach((task, index) => {
-                txtContent += `${index + 1}. ${task.taskTitle}\n`;
-                txtContent += `   Date: ${task.date}\n`;
-                txtContent += `   Start Time: ${task.startTime}\n`;
-                txtContent += `   Duration: ${task.hours}h ${task.minutes}m\n`;
-                txtContent += `   Note: ${task.note}\n`;
-                if (task.subtasks.length > 0) {
-                    txtContent += "   Subtasks:\n";
-                    task.subtasks.forEach((subtask, subIndex) => {
-                        txtContent += `      ${index + 1}.${subIndex + 1} ${subtask}\n`;
-                    });
-                }
-                txtContent += "\n";
-            });
-            content = txtContent;
-            mimeType = 'text/plain';
-        } else if (type === 'html') {
-            let htmlContent = `
-            <!DOCTYPE html>
-            <html lang="en">
-            <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>Daily Planner</title>
-                <style>
-                    body { font-family: Arial, sans-serif; padding: 20px; }
-                    h1 { text-align: center; }
-                    .task { margin-bottom: 20px; }
-                    .task-title { font-weight: bold; }
-                    .subtask { margin-left: 20px; }
-                    .completed { text-decoration: line-through; }
-                </style>
-            </head>
-            <body>
-                <h1>Daily Planner</h1>
-            `;
-
-            tasks.forEach((task, index) => {
-                htmlContent += `
-                <div class="task">
-                    <p class="task-title">${index + 1}. ${task.taskTitle}</p>
-                    <p>Date: ${task.date}</p>
-                    <p>Start Time: ${task.startTime}</p>
-                    <p>Duration: ${task.hours}h ${task.minutes}m</p>
-                    <p>Note: ${task.note}</p>
-                    ${task.subtasks.length > 0 ? '<p>Subtasks:</p>' : ''}
-                    <ul>
-                `;
-                task.subtasks.forEach((subtask, subIndex) => {
-                    htmlContent += `<li class="subtask"><input type="checkbox"> ${subtask}</li>`;
-                });
-                htmlContent += `
-                    </ul>
-                </div>
-                `;
-            });
-
-            htmlContent += `
-            </body>
-            </html>
-            `;
-
-            content = htmlContent;
-            mimeType = 'text/html';
-        }
-
-        const fileName = `daily_planner_${formattedDate}.${type}`;
-
-        try {
-            const fileMetadata = {
-                name: fileName,
-                mimeType: mimeType
-            };
-            const media = {
-                mimeType: mimeType,
-                body: new Blob([content], { type: mimeType })
-            };
-            const response = await gapi.client.drive.files.create({
-                resource: fileMetadata,
-                media: media,
-                fields: 'id'
-            });
-            console.log('File uploaded to Google Drive with ID:', response.result.id);
-        } catch (error) {
-            console.error('Error uploading file to Google Drive:', error);
-            showAlert('Failed to upload to Google Drive.');
-        }
-    }
-
-    window.uploadToGoogleDrive = uploadToGoogleDrive;
-
-    // Clear local storage after downloading or uploading tasks
-    window.clearTasksAfterAction = function () {
-        localStorage.removeItem('tasks');
-        taskList.innerHTML = '';
-        taskCounter = 1;
-    };
-
-    document.getElementById('authorize-button').addEventListener('click', handleAuthClick);
-    document.getElementById('upload-button').addEventListener('click', () => uploadToGoogleDrive('txt'));
 
     async function handleAuthClick() {
         try {
