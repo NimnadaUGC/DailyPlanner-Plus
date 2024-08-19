@@ -1,13 +1,11 @@
 document.addEventListener('DOMContentLoaded', function () {
     const taskInput = document.getElementById('task-input');
     const taskList = document.getElementById('task-list');
-    let storedTasks = loadTasksFromLocalStorage();
+    const storedTasks = loadTasksFromLocalStorage();
     let taskCounter = storedTasks.length + 1;
 
-    // Clear the list before loading tasks from local storage
     taskList.innerHTML = '';
 
-    // Load tasks from local storage and add to the list
     storedTasks.forEach((task, index) => {
         if (task.taskTitle.trim() !== '') {
             addTask(task.taskTitle, task.startTime, task.hours, task.minutes, task.date, task.note, task.subtasks, index + 1);
@@ -200,6 +198,14 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    function toggleComplete(button) {
+        const li = button.closest('li');
+        if (li) {
+            li.classList.toggle('completed');
+            saveTasksToLocalStorage();
+        }
+    }
+
     function showAlert(message, callback) {
         const alertBox = document.createElement('div');
         alertBox.className = 'custom-alert';
@@ -269,7 +275,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function getFormattedDate() {
         const today = new Date();
         const year = today.getFullYear();
-        const month = String(today.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+        const month = String(today.getMonth() + 1).padStart(2, '0');
         const day = String(today.getDate()).padStart(2, '0');
         return `${year}-${month}-${day}`;
     }
