@@ -1,8 +1,8 @@
 let isPomodoroRunning = false;
 let pomodoroTimer;
-let workTime = 25 / 60 * 60; // 25 minutes
-let shortBreakTime = 5 / 60 * 60; // 5 minutes
-let longBreakTime = 15 / 60 * 60; // 15 minutes
+let workTime = 25 * 60; // 25 minutes
+let shortBreakTime = 5 * 60; // 5 minutes
+let longBreakTime = 15 * 60; // 15 minutes
 let currentTime = workTime;
 let isBreak = false;
 let workSessionsCompleted = 0;
