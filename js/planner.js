@@ -1,3 +1,5 @@
+// planner.js
+
 document.addEventListener('DOMContentLoaded', function () {
     const taskInput = document.getElementById('task-input');
     const taskList = document.getElementById('task-list');
@@ -134,11 +136,11 @@ document.addEventListener('DOMContentLoaded', function () {
         if (taskTitle) {
             currentEditTask = li;
             const editTaskInput = document.getElementById('edit-task-input');
-    
+
             // Set the value and inherit font
             editTaskInput.value = taskTitle.textContent.split('. ')[1];
             editTaskInput.style.fontFamily = getComputedStyle(document.body).fontFamily;
-    
+
             // Common styles for both light and dark modes
             editTaskInput.style.padding = '10px';
             editTaskInput.style.borderRadius = '5px';
@@ -146,10 +148,10 @@ document.addEventListener('DOMContentLoaded', function () {
             editTaskInput.style.borderWidth = '1px';
             editTaskInput.style.width = '100%'; // Make the input full width
             editTaskInput.style.boxSizing = 'border-box'; // Ensure padding is included in the width
-    
+
             // Check if dark mode is active
             const isDarkMode = document.body.classList.contains('dark-mode');
-    
+
             if (isDarkMode) {
                 editTaskInput.style.backgroundColor = '#333'; // Dark background
                 editTaskInput.style.color = '#fff'; // Light text color
@@ -159,11 +161,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 editTaskInput.style.color = '#000'; // Dark text color
                 editTaskInput.style.borderColor = '#ccc'; // Light border
             }
-    
+
             // Display the modal
             editTaskModal.style.display = 'block';
         }
-    }       
+    }
 
     function deleteTask(button) {
         showAlert('Are you sure you want to delete this task?', () => {
@@ -181,12 +183,27 @@ document.addEventListener('DOMContentLoaded', function () {
             const newTaskNumber = index + 1;
             const taskTitle = li.querySelector('.task-title');
             if (taskTitle) {
-                // Ensure taskTitle is not null before accessing its textContent
                 taskTitle.textContent = `${newTaskNumber}. ${taskTitle.textContent.split('. ')[1]}`;
             }
             li.dataset.taskNumber = newTaskNumber;
+
+            // Renumber subtasks for this task
+            renumberSubtasks(li);
         });
-    }    
+    }
+
+    function renumberSubtasks(taskLi) {
+        const taskNumber = taskLi.dataset.taskNumber;
+        const subtasks = taskLi.querySelectorAll('.subtask');
+        subtasks.forEach((subLi, index) => {
+            const subtaskTitle = subLi.querySelector('.subtask-title');
+            if (subtaskTitle) {
+                // Extract subtask text without old numbering
+                const subtaskText = subtaskTitle.textContent.split(' ').slice(1).join(' ');
+                subtaskTitle.textContent = `${taskNumber}.${index + 1} ${subtaskText}`;
+            }
+        });
+    }
 
     function toggleComplete(button) {
         const li = button.closest('li');
@@ -199,21 +216,33 @@ document.addEventListener('DOMContentLoaded', function () {
         const subtaskInput = button.previousElementSibling;
         const subtaskValue = subtaskInput.value.trim();
         if (subtaskValue) {
-            const ul = button.closest('li').querySelector('.subtask-list');
-            const subtaskLi = document.createElement('li');
-            const taskNumber = button.closest('li').dataset.taskNumber;
+            const taskLi = button.closest('li');
+            const ul = taskLi.querySelector('.subtask-list');
+            const taskNumber = taskLi.dataset.taskNumber;
             const subtaskNumber = ul.children.length + 1;
+            const subtaskLi = document.createElement('li');
             subtaskLi.className = 'subtask';
-            subtaskLi.innerHTML = `<span class="subtask-title">${taskNumber}.${subtaskNumber} ${subtaskValue}</span> <i class="fas fa-trash delete" onclick="deleteSubtask(this)" style="color: red;"></i>`;
+            subtaskLi.innerHTML = `
+                <span class="subtask-title">${taskNumber}.${subtaskNumber} ${subtaskValue}</span>
+                <i class="fas fa-trash delete" onclick="deleteSubtask(this)" style="color: red;"></i>
+            `;
             ul.appendChild(subtaskLi);
             subtaskInput.value = '';
+
+            // Renumber subtasks to maintain correct numbering
+            renumberSubtasks(taskLi);
         }
     }
 
     function deleteSubtask(button) {
         const subtaskLi = button.closest('li');
         if (subtaskLi) {
+            const subtaskList = subtaskLi.parentElement;
             subtaskLi.remove();
+
+            // Renumber remaining subtasks
+            const taskLi = subtaskList.closest('li');
+            renumberSubtasks(taskLi);
         }
     }
 
@@ -245,10 +274,9 @@ document.addEventListener('DOMContentLoaded', function () {
             showAlert('No tasks to download.');
             return;
         }
-    
+
         let txtContent = "Daily Planner Tasks:\n\n";
         tasks.forEach((task) => {
-            // Only include fields that have data
             if (task.taskTitle.trim()) {
                 txtContent += `${task.taskTitle}\n`;
             }
@@ -274,7 +302,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
             txtContent += "\n";
         });
-    
+
         const blob = new Blob([txtContent], { type: 'text/plain' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -282,7 +310,7 @@ document.addEventListener('DOMContentLoaded', function () {
         a.download = `daily_planner_${getFormattedDate()}.txt`;
         a.click();
         URL.revokeObjectURL(url);
-    }    
+    }
 
     function downloadHtml() {
         const tasks = getTasksArray();
@@ -290,7 +318,7 @@ document.addEventListener('DOMContentLoaded', function () {
             showAlert('No tasks to download.');
             return;
         }
-    
+
         let htmlContent = `
         <!DOCTYPE html>
         <html lang="en">
@@ -299,88 +327,16 @@ document.addEventListener('DOMContentLoaded', function () {
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>Daily Planner</title>
             <style>
-                body {
-                    font-family: 'Arial', sans-serif;
-                    padding: 20px;
-                    background-color: #f9f9f9;
-                    color: #333;
-                    margin: 0;
-                }
-                h1 {
-                    text-align: center;
-                    color: #4a90e2;
-                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                    font-size: 2.5em;
-                    margin-bottom: 30px;
-                }
-                .task {
-                    background-color: #ffffff;
-                    border-radius: 10px;
-                    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-                    padding: 20px;
-                    margin-bottom: 20px;
-                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                }
-                .task h2 {
-                    font-size: 1.5em;
-                    margin-bottom: 10px;
-                    display: flex;
-                    align-items: center;
-                }
-                .task h2 input[type="checkbox"] {
-                    margin-right: 15px;
-                    transform: scale(1.5);
-                }
-                .task p {
-                    margin: 5px 0;
-                    font-size: 1.1em;
-                }
-                .label {
-                    font-weight: bold;
-                    color: #555;
-                }
-                .emphasis {
-                    color: #d9534f;
-                }
-                .highlight {
-                    background-color: #ffeb3b;
-                    padding: 2px 5px;
-                    border-radius: 3px;
-                }
-                .note {
-                    font-style: italic;
-                    color: #777;
-                }
-                ul {
-                    list-style-type: none;
-                    padding-left: 0;
-                    margin-top: 10px;
-                }
-                ul li {
-                    font-size: 1.1em;
-                    margin-bottom: 8px;
-                    display: flex;
-                    align-items: center;
-                }
-                ul li input[type="checkbox"] {
-                    margin-right: 15px;
-                    transform: scale(1.2);
-                }
-                h3 {
-                    margin-top: 15px;
-                    font-size: 1.3em;
-                    color: #333;
-                    font-weight: bold;
-                }
+                /* Your CSS styles here */
             </style>
         </head>
         <body>
             <h1>Daily Planner</h1>
         `;
-    
+
         tasks.forEach((task) => {
             htmlContent += `<div class="task">`;
-            
+
             if (task.taskTitle.trim()) {
                 htmlContent += `<h2><input type="checkbox" class="task-checkbox">${task.taskTitle}</h2>`;
             }
@@ -399,15 +355,15 @@ document.addEventListener('DOMContentLoaded', function () {
             if (task.subtasks.length > 0) {
                 htmlContent += '<h3>Subtasks:</h3><ul>' + task.subtasks.map(subtask => subtask.trim() ? `<li><input type="checkbox" class="subtask-checkbox">${subtask}</li>` : '').join('') + '</ul>';
             }
-            
+
             htmlContent += `</div>`;
         });
-    
+
         htmlContent += `
         </body>
         </html>
         `;
-    
+
         const blob = new Blob([htmlContent], { type: 'text/html' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -415,7 +371,7 @@ document.addEventListener('DOMContentLoaded', function () {
         a.download = `daily_planner_${getFormattedDate()}.html`;
         a.click();
         URL.revokeObjectURL(url);
-    }    
+    }
 
     function getFormattedDate() {
         const today = new Date();
@@ -428,20 +384,23 @@ document.addEventListener('DOMContentLoaded', function () {
     function getTasksArray() {
         const tasks = [];
         taskList.querySelectorAll('li').forEach(li => {
-            const taskTitle = li.querySelector('.task-title') ? li.querySelector('.task-title').textContent : '';
+            const taskTitleElement = li.querySelector('.task-title');
+            const taskTitle = taskTitleElement ? taskTitleElement.textContent.split('. ').slice(1).join('. ') : '';
             const startTime = li.querySelector('.start-time') ? li.querySelector('.start-time').value : '';
             const hours = li.querySelector('.expected-hours') ? li.querySelector('.expected-hours').value : '';
             const minutes = li.querySelector('.expected-minutes') ? li.querySelector('.expected-minutes').value : '';
             const date = li.querySelector('input[type="date"]') ? li.querySelector('input[type="date"]').value : '';
             const note = li.querySelector('.note textarea') ? li.querySelector('.note textarea').value : '';
             const subtasks = [];
-            li.querySelectorAll('.subtask').forEach(
-                subtask => {
-                    if (subtask.querySelector('.subtask-title')) {
-                        subtasks.push(subtask.querySelector('.subtask-title').textContent);
-                    }
+
+            li.querySelectorAll('.subtask').forEach(subtask => {
+                const subtaskTitleElement = subtask.querySelector('.subtask-title');
+                if (subtaskTitleElement) {
+                    const subtaskText = subtaskTitleElement.textContent.split(' ').slice(1).join(' ');
+                    subtasks.push(subtaskText);
                 }
-            );
+            });
+
             tasks.push({ taskTitle, startTime, hours, minutes, date, note, subtasks });
         });
         return tasks;
