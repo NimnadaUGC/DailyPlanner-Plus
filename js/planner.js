@@ -277,25 +277,25 @@ document.addEventListener('DOMContentLoaded', function () {
         let txtContent = "Daily Planner Tasks:\n\n";
         tasks.forEach((task) => {
             if (task.taskTitle.trim()) {
-                txtContent += `${task.taskTitle}\n`;
+                txtContent += `Task: ${task.taskTitle}\n`;
             }
             if (task.date.trim()) {
-                txtContent += `   Date: ${task.date}\n`;
+                txtContent += `Date: ${task.date}\n`;
             }
             if (task.startTime.trim()) {
-                txtContent += `   Start Time: ${task.startTime}\n`;
+                txtContent += `Start Time: ${task.startTime}\n`;
             }
             if (task.hours.trim() || task.minutes.trim()) {
-                txtContent += `   Duration: ${task.hours ? `${task.hours}h` : ''} ${task.minutes ? `${task.minutes}m` : ''}\n`;
+                txtContent += `Duration: ${task.hours ? `${task.hours}h` : ''} ${task.minutes ? `${task.minutes}m` : ''}\n`;
             }
             if (task.note.trim()) {
-                txtContent += `   Note: ${task.note}\n`;
+                txtContent += `Note: ${task.note}\n`;
             }
             if (task.subtasks.length > 0) {
-                txtContent += "   Subtasks:\n";
+                txtContent += "Subtasks:\n";
                 task.subtasks.forEach((subtask) => {
                     if (subtask.trim()) {
-                        txtContent += `      - ${subtask}\n`;
+                        txtContent += `- ${subtask}\n`;
                     }
                 });
             }
@@ -326,7 +326,79 @@ document.addEventListener('DOMContentLoaded', function () {
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>Daily Planner</title>
             <style>
-                /* Your CSS styles here */
+                body {
+                    font-family: 'Arial', sans-serif;
+                    padding: 20px;
+                    background-color: #f9f9f9;
+                    color: #333;
+                    margin: 0;
+                }
+                h1 {
+                    text-align: center;
+                    color: #4a90e2;
+                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                    font-size: 2.5em;
+                    margin-bottom: 30px;
+                }
+                .task {
+                    background-color: #ffffff;
+                    border-radius: 10px;
+                    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                    padding: 20px;
+                    margin-bottom: 20px;
+                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                }
+                .task h2 {
+                    font-size: 1.5em;
+                    margin-bottom: 10px;
+                    display: flex;
+                    align-items: center;
+                }
+                .task h2 input[type="checkbox"] {
+                    margin-right: 15px;
+                    transform: scale(1.5);
+                }
+                .task p {
+                    margin: 5px 0;
+                    font-size: 1.1em;
+                }
+                .label {
+                    font-weight: bold;
+                    color: #555;
+                }
+                .emphasis {
+                    color: #d9534f;
+                }
+                .highlight {
+                    background-color: #ffeb3b;
+                    padding: 2px 5px;
+                    border-radius: 3px;
+                }
+                .note {
+                    font-style: italic;
+                    color: #777;
+                }
+                ul {
+                    list-style-type: none;
+                    padding-left: 0;
+                    margin-top: 10px;
+                }
+                ul li {
+                    font-size: 1.1em;
+                    margin-bottom: 8px;
+                    display: flex;
+                    align-items: center;
+                }
+                ul li input[type="checkbox"] {
+                    margin-right: 15px;
+                    transform: scale(1.2);
+                }
+                h3 {
+                    margin-top: 15px;
+                    font-size: 1.3em;
+                    color: #333;
+                    font-weight: bold;
+                }
             </style>
         </head>
         <body>
