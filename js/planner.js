@@ -178,12 +178,13 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function renumberTasks() {
-        const tasks = document.querySelectorAll('#task-list li');
+        const tasks = taskList.querySelectorAll(':scope > li');
         tasks.forEach((li, index) => {
             const newTaskNumber = index + 1;
             const taskTitle = li.querySelector('.task-title');
             if (taskTitle) {
-                taskTitle.textContent = `${newTaskNumber}. ${taskTitle.textContent.split('. ')[1]}`;
+                const oldTitle = taskTitle.textContent.split('. ').slice(1).join('. ');
+                taskTitle.textContent = `${newTaskNumber}. ${oldTitle}`;
             }
             li.dataset.taskNumber = newTaskNumber;
 
@@ -194,7 +195,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function renumberSubtasks(taskLi) {
         const taskNumber = taskLi.dataset.taskNumber;
-        const subtasks = taskLi.querySelectorAll('.subtask');
+        const subtasks = taskLi.querySelectorAll('.subtask-list .subtask');
         subtasks.forEach((subLi, index) => {
             const subtaskTitle = subLi.querySelector('.subtask-title');
             if (subtaskTitle) {
@@ -218,12 +219,10 @@ document.addEventListener('DOMContentLoaded', function () {
         if (subtaskValue) {
             const taskLi = button.closest('li');
             const ul = taskLi.querySelector('.subtask-list');
-            const taskNumber = taskLi.dataset.taskNumber;
-            const subtaskNumber = ul.children.length + 1;
             const subtaskLi = document.createElement('li');
             subtaskLi.className = 'subtask';
             subtaskLi.innerHTML = `
-                <span class="subtask-title">${taskNumber}.${subtaskNumber} ${subtaskValue}</span>
+                <span class="subtask-title">TEMP_NUMBER ${subtaskValue}</span>
                 <i class="fas fa-trash delete" onclick="deleteSubtask(this)" style="color: red;"></i>
             `;
             ul.appendChild(subtaskLi);
@@ -383,7 +382,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function getTasksArray() {
         const tasks = [];
-        taskList.querySelectorAll('li').forEach(li => {
+        const taskLis = taskList.querySelectorAll(':scope > li');
+        taskLis.forEach(li => {
             const taskTitleElement = li.querySelector('.task-title');
             const taskTitle = taskTitleElement ? taskTitleElement.textContent.split('. ').slice(1).join('. ') : '';
             const startTime = li.querySelector('.start-time') ? li.querySelector('.start-time').value : '';
@@ -393,7 +393,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const note = li.querySelector('.note textarea') ? li.querySelector('.note textarea').value : '';
             const subtasks = [];
 
-            li.querySelectorAll('.subtask').forEach(subtask => {
+            li.querySelectorAll('.subtask-list .subtask').forEach(subtask => {
                 const subtaskTitleElement = subtask.querySelector('.subtask-title');
                 if (subtaskTitleElement) {
                     const subtaskText = subtaskTitleElement.textContent.split(' ').slice(1).join(' ');
